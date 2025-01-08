@@ -1,11 +1,12 @@
 import { redisConnect } from "./utils/clients/redis.client";
 import { bot } from "./utils/clients/telegraf.client";
+import { botStart } from "./utils/tg/commands/start.command";
 
 async function main() {
   try {
     await redisConnect();
-    bot.command("start", (ctx) => ctx.reply("Bot started!"));
 
+    botStart();
     await bot.launch();
   } catch (error) {
     console.error("Bot launch failed:", error);
