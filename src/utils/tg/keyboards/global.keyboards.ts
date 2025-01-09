@@ -42,3 +42,13 @@ export const getKeeperHomeKeyboard = () => {
     [Markup.button.callback("✕ Close", KEEPER_HOME_ACTIONS.CLOSE)],
   ]);
 };
+
+export const getChallengeKeyBoard = () => {
+  return Markup.inlineKeyboard([
+    [Markup.button.callback("🔓 Crack the Vault", KEEPER_HOME_ACTIONS.ATTEMPT)],
+    [
+      Markup.button.callback("⬅️ Back", KEEPER_HOME_ACTIONS.HOME),
+      Markup.button.callback("✕ Close", KEEPER_HOME_ACTIONS.CLOSE),
+    ],
+  ]);
+};

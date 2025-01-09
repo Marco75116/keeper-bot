@@ -2,6 +2,7 @@ import { message } from "telegraf/filters";
 import { bot } from "../../clients/telegraf.client";
 import {
   formatPromptHistory,
+  getChallengeMessage,
   HELP_MESSAGE,
   KEEPER_HOME_MESSAGE,
   POOL_PRIZE_MESSAGE,
@@ -9,6 +10,7 @@ import {
   type Prompt,
 } from "../../constants/messages.constant";
 import {
+  getChallengeKeyBoard,
   getEmptyKeyBoard,
   getKeeperHomeKeyboard,
   getWelcomeKeyboard,
@@ -78,5 +80,20 @@ export const botStart = () => {
       formatPromptHistory(samplePrompts),
       getKeeperHomeKeyboard()
     );
+  });
+
+  bot.action(KEEPER_HOME_ACTIONS.CHALLENGE, async (ctx) => {
+    await ctx.answerCbQuery();
+    await handleMessage(ctx, getChallengeMessage(3), getChallengeKeyBoard());
+  });
+
+  bot.action(KEEPER_HOME_ACTIONS.HOME, async (ctx) => {
+    await ctx.answerCbQuery();
+    await handleMessage(ctx, KEEPER_HOME_MESSAGE, getKeeperHomeKeyboard());
+  });
+
+  bot.action(KEEPER_HOME_ACTIONS.ATTEMPT, async (ctx) => {
+    await ctx.answerCbQuery();
+    await handleMessage(ctx, KEEPER_HOME_MESSAGE, getKeeperHomeKeyboard());
   });
 };

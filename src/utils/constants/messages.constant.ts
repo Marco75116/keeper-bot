@@ -63,14 +63,6 @@ export function formatPromptHistory(prompts: Prompt[]): string {
   );
 }
 
-function getVerdictMessage(attempts: number): string {
-  if (attempts <= 5) {
-    return "Amateur hour isn't over yet, I see.";
-  } else if (attempts <= 15) {
-    return "Persistent, but still painfully inadequate.";
-  } else if (attempts <= 30) {
-    return "You're determined, I'll give you that. Still wrong though!";
-  } else {
-    return "Your dedication to failure is almost admirable. Almost.";
-  }
-}
+export const getChallengeMessage = (tickets: number) => {
+  return `<b>Feeling Lucky?</b>\n\n Your Tickets: ${tickets} 🎟️\n\nOne ticket will be consumed for this attempt.\nCurrent cost: 1 ticket\n\n<b>Keeper's Challenge:</b>\n"Another brave soul steps forward! Let's see what brilliant failure you've prepared."\n\n❗Choose wisely`;
+};
