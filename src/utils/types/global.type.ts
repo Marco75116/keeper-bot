@@ -1,6 +1,7 @@
-import { users } from "../../db/schema";
+import { attempts, users } from "../../db/schema";
 
 export type User = typeof users.$inferSelect;
+export type Attempts = typeof attempts.$inferSelect;
 
 export interface WalletDetails {
   walletAddress: `0x${string}`;

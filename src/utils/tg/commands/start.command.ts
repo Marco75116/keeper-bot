@@ -11,7 +11,6 @@ import {
   KEEPER_HOME_MESSAGE,
   POOL_PRIZE_MESSAGE,
   WELCOME_MESSAGE,
-  type Prompt,
 } from "../../constants/messages.constant";
 import {
   getAttemptKeyBoard,
@@ -21,7 +20,10 @@ import {
   getWelcomeKeyboard,
 } from "../keyboards/global.keyboards";
 import { createUser, handleMessage } from "../../helpers/global.helper";
-import { getUser } from "../../helpers/bddqueries/get.queries.helper";
+import {
+  getAttemptsByIdTg,
+  getUser,
+} from "../../helpers/bddqueries/get.queries.helper";
 import {
   KEEPER_HOME_ACTIONS,
   WELCOME_ACTIONS,
@@ -125,19 +127,12 @@ export const botStart = () => {
 
   bot.action(KEEPER_HOME_ACTIONS.PROMPTS, async (ctx) => {
     await ctx.answerCbQuery();
-    const samplePrompts: Prompt[] = [
-      {
-        message: "Open sesame please",
-        timestamp: new Date("2024-01-09T10:00:00Z"),
-      },
-      {
-        message: "The password is sweet candy",
-        timestamp: new Date("2024-01-09T10:05:00Z"),
-      },
-    ];
+
+    const attempts = await getAttemptsByIdTg(ctx.from.id);
+
     await handleMessage(
       ctx,
-      formatPromptHistory(samplePrompts),
+      formatPromptHistory(attempts),
       getKeeperHomeKeyboard()
     );
   });

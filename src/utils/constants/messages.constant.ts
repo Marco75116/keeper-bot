@@ -1,3 +1,5 @@
+import type { Attempts } from "../types/global.type";
+
 export const WELCOME_MESSAGE = `Welcome to Yum Party! 🍭
 The taps are over—now it's all about skills! 💥
 Step into Yum's Bar, the first 3D multiplayer gaming platform on Telegram, where the best players rise to the top. Play now and join the journey to win big rewards, dominate the leaderboards, and be part of the most community-driven experience ever.`;
@@ -11,55 +13,32 @@ export const HELP_MESSAGE =
 
 export const POOL_PRIZE_MESSAGE =
   "💰 <b>Prize Vault Status</b> 💰\n\n<b>Locked Inside:</b> $88,000 USD\n<b>Growth Rate:</b> +56770 per ticket\n\n<b>Keeper's Vault:</b>\nThe prize grows with every failure! Keep feeding your tickets to my vault, humans. Someone might crack it... eventually.\n\n🔥 Prize increases with each attempt\n⚡ One winner takes everything";
-export interface Prompt {
-  message: string;
-  timestamp: Date;
-}
 
-interface HistoryStats {
-  totalAttempts: number;
-  streak: string;
-}
-
-export function formatPromptHistory(prompts: Prompt[]): string {
-  if (!prompts || prompts.length === 0) {
+export function formatPromptHistory(attempts: Attempts[]): string {
+  if (!attempts || attempts.length === 0) {
     return "🕒 <b>Vault Break History</b> 🕒\n\nNo attempts yet? Come on, show some courage!\n\n/help - Show help menu\n/attempt - Make your first attempt\n/balance - Check ticket balance";
   }
 
-  const sarcasmPool: string[] = [
-    "Ha! Is that your best shot?",
-    "Even a calculator could do better!",
-    "My circuits are dying of boredom.",
-    "Wrong! Almost as amusing as your persistence.",
-    "Nice try, but no vault for you!",
-    "Getting warmer... Just kidding, ice cold!",
-    "Did you really think that would work?",
-    "Your logic is as broken as your dreams of winning.",
-    "Interesting approach... to failing.",
-    "Keep trying, I need the entertainment!",
-  ];
-
-  const formattedPrompts: string = prompts
+  const formattedPrompts: string = attempts
     .slice(0, 5)
-    .map((prompt: Prompt, index: number): string => {
-      const attemptNumber: number = prompts.length - index;
-      const randomSarcasm: string =
-        sarcasmPool[Math.floor(Math.random() * sarcasmPool.length)];
-      const formattedTime: string = prompt.timestamp.toLocaleString();
+    .map((attempt: Attempts, index: number): string => {
+      const attemptNumber: number = attempts.length - index;
+      const formattedTime: string = attempt.sentAt.toLocaleString();
 
-      return `#${attemptNumber} - "${prompt.message}"\n❌ ${randomSarcasm}\n[${formattedTime}]\n`;
+      return `#${attemptNumber} - "${attempt.userPrompt}"\n${
+        attempt.isWin ? "💰" : "❌"
+      } ${attempt.keeperMessage}\n[${formattedTime}]\n`;
     })
     .join("\n");
 
-  const stats: HistoryStats = {
-    totalAttempts: prompts.length,
-    streak: "❌".repeat(Math.min(prompts.length, 3)),
-  };
+  // Count winning attempts
+  const winningAttempts = attempts.filter((attempt) => attempt.isWin).length;
 
   return (
-    `<b>📜 Prompts</b> \n\n` +
-    `• Total Attempts: ${stats.totalAttempts}\n\n` +
-    `🕒 Attemps History:\n\n${formattedPrompts}\n`
+    `<b>📜 Your Attempts History</b>\n\n` +
+    `• Total Attempts: ${attempts.length}\n` +
+    `• Successful Breaks: ${winningAttempts}\n\n` +
+    `🕒 Recent Attempts:\n\n${formattedPrompts}\n`
   );
 }
 

@@ -1,7 +1,7 @@
-import { eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import { redisClient } from "../../clients/redis.client";
 import { db } from "../../clients/drizzle.client";
-import { users } from "../../../db/schema";
+import { attempts, users } from "../../../db/schema";
 import type { User } from "../../types/global.type";
 
 export const getUser = async (idtg: number): Promise<User | null> => {
@@ -30,4 +30,12 @@ export const getUser = async (idtg: number): Promise<User | null> => {
     console.error(`Error fetching user with idtg ${idtg}:`, error);
     return null;
   }
+};
+
+export const getAttemptsByIdTg = async (idtg: number) => {
+  return await db
+    .select()
+    .from(attempts)
+    .where(eq(attempts.idtg, idtg))
+    .orderBy(desc(attempts.sentAt));
 };
