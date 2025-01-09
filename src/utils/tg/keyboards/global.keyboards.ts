@@ -52,3 +52,12 @@ export const getChallengeKeyBoard = () => {
     ],
   ]);
 };
+
+export const getAttemptKeyBoard = () => {
+  return Markup.inlineKeyboard([
+    [
+      Markup.button.callback("⬅️ Back", KEEPER_HOME_ACTIONS.CHALLENGE),
+      Markup.button.callback("✕ Close", KEEPER_HOME_ACTIONS.CLOSE),
+    ],
+  ]);
+};

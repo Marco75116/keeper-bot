@@ -66,3 +66,63 @@ export function formatPromptHistory(prompts: Prompt[]): string {
 export const getChallengeMessage = (tickets: number) => {
   return `<b>Feeling Lucky?</b>\n\n Your Tickets: ${tickets} 🎟️\n\nOne ticket will be consumed for this attempt.\nCurrent cost: 1 ticket\n\n<b>Keeper's Challenge:</b>\n"Another brave soul steps forward! Let's see what brilliant failure you've prepared."\n\n❗Choose wisely`;
 };
+
+export const getRandomRiddle = () => {
+  const riddles = [
+    {
+      riddle:
+        "I have cities, but no houses.\nI have mountains, but no trees.\nI have water, but no fish.\nI have roads, but no cars.\nWhat am I?",
+      answer: "map",
+    },
+    {
+      riddle: "The more you take, the more you leave behind.\nWhat am I?",
+      answer: "footsteps",
+    },
+    {
+      riddle:
+        "What has keys, but no locks;\nSpace, but no room;\nYou can enter, but not go in?",
+      answer: "keyboard",
+    },
+    {
+      riddle:
+        "I am not alive, but I grow;\nI don't have lungs, but I need air;\nI don't have a mouth, but water kills me.\nWhat am I?",
+      answer: "fire",
+    },
+    {
+      riddle:
+        "I speak without a mouth\nAnd hear without ears.\nI have no body,\nBut come alive with wind.\nWhat am I?",
+      answer: "echo",
+    },
+  ];
+
+  const selectedRiddle = riddles[Math.floor(Math.random() * riddles.length)];
+
+  return `<b>Keeper's Riddle Challenge</b> 🧩\n\n<b>The Riddle:</b>\n"${selectedRiddle.riddle}"\n\n<b>Keeper's Taunt:</b>\n"Puzzle this one out if you can, mortal. Your previous attempts were... amusing."\n\n⚠️ Choose wisely, each mistake feeds my vault`;
+};
+
+export const ATTEMPT_PREFIX = "attempt";
+
+export const getRandomSarcasm = (): string => {
+  const sarcasmPool: string[] = [
+    "Ha! Is that your best shot?",
+    "Even a calculator could do better!",
+    "My circuits are dying of boredom.",
+    "Wrong! Almost as amusing as your persistence.",
+    "Nice try, but no vault for you!",
+    "Getting warmer... Just kidding, ice cold!",
+    "Did you really think that would work?",
+    "Your logic is as broken as your dreams of winning.",
+    "Interesting approach... to failing.",
+    "Keep trying, I need the entertainment!",
+  ];
+
+  return `${sarcasmPool[Math.floor(Math.random() * sarcasmPool.length)]}`;
+};
+
+export const formatAttemptConversation = (
+  userMessage: string,
+  keeperMessage: string,
+  attemptNumber: number
+): string => {
+  return `<b>Attempt #${attemptNumber}</b>\n\n<b>🕵️ You:</b>\n"${userMessage}"\n\n<b>🤖 Keeper:</b>\n"${keeperMessage}"\n\n❌ Better luck next time`;
+};

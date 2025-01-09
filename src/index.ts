@@ -1,4 +1,4 @@
-import { redisConnect } from "./utils/clients/redis.client";
+import { redisClient, redisConnect } from "./utils/clients/redis.client";
 import { bot } from "./utils/clients/telegraf.client";
 import { botStart } from "./utils/tg/commands/start.command";
 
@@ -14,7 +14,13 @@ async function main() {
   }
 }
 
-process.once("SIGINT", () => bot.stop("SIGINT"));
-process.once("SIGTERM", () => bot.stop("SIGTERM"));
+process.once("SIGINT", async () => {
+  bot.stop("SIGINT");
+  await redisClient.quit();
+});
+process.once("SIGTERM", async () => {
+  bot.stop("SIGTERM");
+  await redisClient.quit();
+});
 
 main();

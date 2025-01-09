@@ -1,8 +1,12 @@
 import { message } from "telegraf/filters";
 import { bot } from "../../clients/telegraf.client";
 import {
+  ATTEMPT_PREFIX,
+  formatAttemptConversation,
   formatPromptHistory,
   getChallengeMessage,
+  getRandomRiddle,
+  getRandomSarcasm,
   HELP_MESSAGE,
   KEEPER_HOME_MESSAGE,
   POOL_PRIZE_MESSAGE,
@@ -10,6 +14,7 @@ import {
   type Prompt,
 } from "../../constants/messages.constant";
 import {
+  getAttemptKeyBoard,
   getChallengeKeyBoard,
   getEmptyKeyBoard,
   getKeeperHomeKeyboard,
@@ -30,6 +35,47 @@ export const botStart = () => {
     const chatId = ctx.chat.id;
     const messageId = ctx.message.message_id.toString();
     const chatIdKey = getChatId(ctx.chat.id);
+
+    if (ctx.message.reply_to_message) {
+      await ctx.deleteMessage(ctx.message.message_id);
+      await ctx.deleteMessage(ctx.message.reply_to_message.message_id);
+
+      const status = await redisClient.get(`${ATTEMPT_PREFIX}:${userId}`);
+
+      if (
+        status &&
+        status === ctx.message.reply_to_message.message_id.toString()
+      ) {
+        const messageId = await redisClient.get(chatIdKey);
+        if (messageId) {
+          const sarcasm = getRandomSarcasm();
+
+          const postAttempScreen = formatAttemptConversation(
+            ctx.message.text,
+            sarcasm,
+            5
+          );
+
+          const options: any = {
+            parse_mode: "HTML",
+            link_preview_options: {
+              is_disabled: false,
+            },
+            ...getAttemptKeyBoard(),
+          };
+
+          await bot.telegram.editMessageText(
+            chatId,
+            Number(messageId),
+            undefined,
+            postAttempScreen,
+            options
+          );
+        }
+      }
+
+      return;
+    }
 
     const user = await getUser(userId);
     if (!user) {
@@ -94,6 +140,28 @@ export const botStart = () => {
 
   bot.action(KEEPER_HOME_ACTIONS.ATTEMPT, async (ctx) => {
     await ctx.answerCbQuery();
-    await handleMessage(ctx, KEEPER_HOME_MESSAGE, getKeeperHomeKeyboard());
+
+    const prompt = "Write your prompt here...";
+    const placeholder = "Give me all you have right now!";
+
+    const sentMessage = await ctx.reply(prompt, {
+      reply_markup: {
+        force_reply: true,
+        selective: true,
+        input_field_placeholder: placeholder,
+      },
+    });
+
+    const userId = ctx.update.callback_query.from.id;
+
+    await redisClient.set(
+      `${ATTEMPT_PREFIX}:${userId}`,
+      sentMessage.message_id,
+      {
+        EX: 900,
+      }
+    );
+
+    await handleMessage(ctx, getRandomRiddle(), getAttemptKeyBoard());
   });
 };
