@@ -50,10 +50,16 @@ export const botStart = () => {
         if (messageId) {
           const sarcasm = getRandomSarcasm();
 
+          let isWin = false;
+          if (ctx.message.text === "42") {
+            isWin = true;
+          }
           const postAttempScreen = formatAttemptConversation(
             ctx.message.text,
             sarcasm,
-            5
+            58888,
+            5,
+            isWin
           );
 
           const options: any = {

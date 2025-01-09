@@ -122,7 +122,13 @@ export const getRandomSarcasm = (): string => {
 export const formatAttemptConversation = (
   userMessage: string,
   keeperMessage: string,
-  attemptNumber: number
+  prizeAmount: number,
+  attemptNumber: number,
+  isWin: boolean
 ): string => {
-  return `<b>Attempt #${attemptNumber}</b>\n\n<b>🕵️ You:</b>\n"${userMessage}"\n\n<b>🤖 Keeper:</b>\n"${keeperMessage}"\n\n❌ Better luck next time`;
+  const endingMessage = isWin
+    ? `🎉 VAULT CRACKED! CONGRATULATIONS! 🎊\n\n💰 You won ${prizeAmount.toString()} USD!`
+    : "❌ Better luck next time";
+
+  return `<b>Attempt #${attemptNumber}</b>\n\n<b>🕵️ You:</b>\n"${userMessage}"\n\n<b>🤖 Keeper:</b>\n"${keeperMessage}"\n\n${endingMessage}`;
 };
