@@ -9,6 +9,8 @@ The Vault Breaker Giveaway introduces an exciting new event reward, complementin
 export const HELP_MESSAGE =
   "<b>Welcome to the Vault Breaker Giveaway!</b> 🔒\n\nThink you have what it takes to crack the vault? Here's what you need to know, mortal:\n\n<b>How to Participate:</b>\n1. Purchase tickets\n2. Follow our social accounts and pay attention to Chocolate, Lollipop, Marshmallow, and Cookie - they drop crucial clues\n3. Send me your prompts here on Telegram\n\nBe clever, be persistent - the vault doesn't open for just anyone\n\n<b>Important Rules:</b>\n• Each prompt attempt requires spending one ticket\n• Tickets are purchased through the Yum's token\n• The prize pool grows with each ticket spent\n\nThink you've got what it takes? Prove it. 🔐 ";
 
+export const POOL_PRIZE_MESSAGE =
+  "💰 <b>Prize Vault Status</b> 💰\n\n<b>Locked Inside:</b> $88,000 USD\n<b>Growth Rate:</b> +56770 per ticket\n\n<b>Keeper's Vault:</b>\nThe prize grows with every failure! Keep feeding your tickets to my vault, humans. Someone might crack it... eventually.\n\n🔥 Prize increases with each attempt\n⚡ One winner takes everything";
 export interface Prompt {
   message: string;
   timestamp: Date;

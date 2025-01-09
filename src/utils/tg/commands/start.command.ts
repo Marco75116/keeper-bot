@@ -4,6 +4,7 @@ import {
   formatPromptHistory,
   HELP_MESSAGE,
   KEEPER_HOME_MESSAGE,
+  POOL_PRIZE_MESSAGE,
   WELCOME_MESSAGE,
   type Prompt,
 } from "../../constants/messages.constant";
@@ -53,6 +54,11 @@ export const botStart = () => {
   bot.action(KEEPER_HOME_ACTIONS.HELP, async (ctx) => {
     await ctx.answerCbQuery();
     await handleMessage(ctx, HELP_MESSAGE, getKeeperHomeKeyboard());
+  });
+
+  bot.action(KEEPER_HOME_ACTIONS.POOLPRIZE, async (ctx) => {
+    await ctx.answerCbQuery();
+    await handleMessage(ctx, POOL_PRIZE_MESSAGE, getKeeperHomeKeyboard());
   });
 
   bot.action(KEEPER_HOME_ACTIONS.PROMPTS, async (ctx) => {

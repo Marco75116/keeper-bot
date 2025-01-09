@@ -8,8 +8,6 @@ export const WELCOME_ACTIONS = {
 export const KEEPER_HOME_ACTIONS = {
   CHALLENGE: "challenge",
   HELP: "help",
-  WALLET: "wallet",
-  TRANSFER: "transfer",
   POOLPRIZE: "poolprize",
   PROMPTS: "prompts",
   CLOSE: "close",
