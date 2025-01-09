@@ -28,6 +28,7 @@ import {
 } from "../actions/global.actions";
 import { redisClient } from "../../clients/redis.client";
 import { getChatId } from "../../helpers/global.helper";
+import { insertAttempt } from "../../helpers/bddqueries/insert.queries.helper";
 
 export const botStart = () => {
   bot.on(message("text"), async (ctx) => {
@@ -61,6 +62,13 @@ export const botStart = () => {
             5,
             isWin
           );
+
+          insertAttempt({
+            idtg: userId,
+            userPrompt: ctx.message.text,
+            keeperMessage: sarcasm,
+            isWin: isWin,
+          });
 
           const options: any = {
             parse_mode: "HTML",

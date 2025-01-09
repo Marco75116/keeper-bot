@@ -1,6 +1,10 @@
-import { users, wallets } from "../../../db/schema";
+import { attempts, users, wallets } from "../../../db/schema";
 import { db } from "../../clients/drizzle.client";
-import type { CreateUserParams, EncryptedData } from "../../types/global.type";
+import type {
+  CreateAttemptParams,
+  CreateUserParams,
+  EncryptedData,
+} from "../../types/global.type";
 
 export const insertUser = async (params: CreateUserParams) => {
   return await db
@@ -26,6 +30,18 @@ export const insertWallet = async (params: {
       wallet: params.wallet,
       iv: params.encryptedData.iv,
       encryptedPrivateKey: params.encryptedData.encryptedData,
+    })
+    .returning();
+};
+
+export const insertAttempt = async (params: CreateAttemptParams) => {
+  return await db
+    .insert(attempts)
+    .values({
+      idtg: params.idtg,
+      userPrompt: params.userPrompt,
+      keeperMessage: params.keeperMessage,
+      isWin: params.isWin,
     })
     .returning();
 };

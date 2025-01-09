@@ -1,4 +1,11 @@
-import { pgTable, serial, text, timestamp, integer } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  serial,
+  text,
+  timestamp,
+  integer,
+  boolean,
+} from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
@@ -15,4 +22,13 @@ export const wallets = pgTable("wallets", {
   wallet: text("wallet").notNull(),
   iv: text("iv").notNull(),
   encryptedPrivateKey: text("encrypted_private_key").notNull(),
+});
+
+export const attempts = pgTable("attempts", {
+  id: serial("id").primaryKey(),
+  idtg: integer("idtg").notNull(),
+  userPrompt: text("user_prompt").notNull(),
+  keeperMessage: text("keeper_message").notNull(),
+  isWin: boolean("is_win").notNull().default(false),
+  sentAt: timestamp("sent_at").defaultNow().notNull(),
 });

@@ -18,3 +18,10 @@ export interface CreateUserParams {
   tgusername?: string;
   wallet: string;
 }
+
+export interface CreateAttemptParams {
+  idtg: number;
+  userPrompt: string;
+  keeperMessage: string;
+  isWin: boolean;
+}
