@@ -98,11 +98,9 @@ export const botStart = () => {
       createUser(ctx.update.message.from);
     }
 
-    const message = await ctx.reply(WELCOME_MESSAGE, getWelcomeKeyboard());
+    await ctx.reply(WELCOME_MESSAGE, getWelcomeKeyboard());
 
     await ctx.deleteMessage(ctx.update.message.message_id);
-
-    await redisClient.set(chatIdKey, message.message_id.toString());
   });
 
   bot.action(WELCOME_ACTIONS.CLOSE, async (ctx) => {

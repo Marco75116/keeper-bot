@@ -64,26 +64,21 @@ export const handleMessage = async (
   try {
     const chatId = ctx.chat?.id;
     if ("callback_query" in ctx.update && ctx.update.callback_query.message) {
-      const chatIdKey = getChatId(ctx.update.callback_query.message.chat.id);
+      const options: any = {
+        parse_mode: "HTML",
+        link_preview_options: {
+          is_disabled: true,
+        },
+        ...keyBoard,
+      };
 
-      const messageIdToEDit = await redisClient.get(chatIdKey);
-      if (messageIdToEDit) {
-        const options: any = {
-          parse_mode: "HTML",
-          link_preview_options: {
-            is_disabled: true,
-          },
-          ...keyBoard,
-        };
-
-        await bot.telegram.editMessageText(
-          chatId,
-          Number(messageIdToEDit),
-          undefined,
-          text,
-          options
-        );
-      }
+      await bot.telegram.editMessageText(
+        chatId,
+        ctx.update.callback_query.message.message_id,
+        undefined,
+        text,
+        options
+      );
     }
   } catch (error) {
     console.error("Error in handleMessage:", error);
