@@ -1,9 +1,11 @@
-import type { User } from "telegraf/types";
+import type { InlineKeyboardMarkup, User } from "telegraf/types";
 import type { EncryptedData } from "../types/global.type";
 import { createWallet, faucet } from "./viem.helper";
-
 import crypto from "crypto";
 import { insertUser, insertWallet } from "./bddqueries/insert.queries.helper";
+import { Context, Markup } from "telegraf";
+import { bot } from "../clients/telegraf.client";
+import { redisClient } from "../clients/redis.client";
 
 const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY;
 
@@ -52,4 +54,42 @@ export const createUser = (tgUser: User) => {
   });
   // skip for now
   // faucet(walletDetails.walletAddress);
+};
+
+export const handleMessage = async (
+  ctx: Context,
+  text: string,
+  keyBoard: Markup.Markup<InlineKeyboardMarkup>
+) => {
+  try {
+    const chatId = ctx.chat?.id;
+    if ("callback_query" in ctx.update && ctx.update.callback_query.message) {
+      const chatIdKey = getChatId(ctx.update.callback_query.message.chat.id);
+
+      const messageIdToEDit = await redisClient.get(chatIdKey);
+      if (messageIdToEDit) {
+        const options: any = {
+          parse_mode: "HTML",
+          link_preview_options: {
+            is_disabled: true,
+          },
+          ...keyBoard,
+        };
+
+        await bot.telegram.editMessageText(
+          chatId,
+          Number(messageIdToEDit),
+          undefined,
+          text,
+          options
+        );
+      }
+    }
+  } catch (error) {
+    console.error("Error in handleMessage:", error);
+  }
+};
+
+export const getChatId = (chatId: number): string => {
+  return `chatId-${chatId}`;
 };

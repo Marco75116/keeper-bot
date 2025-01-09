@@ -1,5 +1,8 @@
 import { Markup } from "telegraf";
-import { WELCOME_ACTIONS } from "../actions/global.actions";
+import {
+  KEEPER_HOME_ACTIONS,
+  WELCOME_ACTIONS,
+} from "../actions/global.actions";
 
 export const getEmptyKeyBoard = () => {
   return Markup.inlineKeyboard([]);
@@ -21,5 +24,25 @@ export const getWelcomeKeyboard = () => {
       ),
     ],
     [Markup.button.callback("✕ Close", WELCOME_ACTIONS.CLOSE)],
+  ]);
+};
+export const getKeeperHomeKeyboard = () => {
+  return Markup.inlineKeyboard([
+    [
+      Markup.button.callback(
+        "🎟️ Challenge Keeper",
+        KEEPER_HOME_ACTIONS.CHALLENGE
+      ),
+    ],
+    [
+      Markup.button.callback("💰 Pool Prize", KEEPER_HOME_ACTIONS.POOLPRIZE),
+      Markup.button.callback("📜 Prompts", KEEPER_HOME_ACTIONS.PROMPTS),
+    ],
+    [
+      Markup.button.callback("🔐 Wallet", KEEPER_HOME_ACTIONS.WALLET),
+      Markup.button.callback("➡️ Transfer", KEEPER_HOME_ACTIONS.TRANSFER),
+    ],
+    [Markup.button.callback("🙋‍♂️ Help", KEEPER_HOME_ACTIONS.HELP)],
+    [Markup.button.callback("✕ Close", KEEPER_HOME_ACTIONS.CLOSE)],
   ]);
 };
