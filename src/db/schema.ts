@@ -5,7 +5,14 @@ export const users = pgTable("users", {
   idtg: integer("idtg").notNull(),
   firstname: text("firstname").notNull(),
   tgusername: text("tgusername"),
-  suborg: text("suborg").notNull(),
   wallet: text("wallet").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const wallets = pgTable("wallets", {
+  id: serial("id").primaryKey(),
+  idtg: integer("idtg").notNull().unique(),
+  wallet: text("wallet").notNull(),
+  iv: text("iv").notNull(),
+  encryptedPrivateKey: text("encrypted_private_key").notNull(),
 });
