@@ -7,13 +7,14 @@ import {
   integer,
   boolean,
   check,
+  bigint,
 } from "drizzle-orm/pg-core";
 
 export const users = pgTable(
   "users",
   {
     id: serial("id").primaryKey(),
-    idtg: integer("idtg").notNull(),
+    idtg: bigint("idtg", { mode: "number" }).notNull(),
     firstname: text("firstname").notNull(),
     tgusername: text("tgusername"),
     wallet: text("wallet").notNull(),
@@ -28,7 +29,7 @@ export const users = pgTable(
 
 export const wallets = pgTable("wallets", {
   id: serial("id").primaryKey(),
-  idtg: integer("idtg").notNull().unique(),
+  idtg: bigint("idtg", { mode: "number" }).notNull().unique(),
   wallet: text("wallet").notNull(),
   iv: text("iv").notNull(),
   encryptedPrivateKey: text("encrypted_private_key").notNull(),
@@ -36,7 +37,7 @@ export const wallets = pgTable("wallets", {
 
 export const attempts = pgTable("attempts", {
   id: serial("id").primaryKey(),
-  idtg: integer("idtg").notNull(),
+  idtg: bigint("idtg", { mode: "number" }).notNull(),
   userPrompt: text("user_prompt").notNull(),
   keeperMessage: text("keeper_message").notNull(),
   isWin: boolean("is_win").notNull().default(false),
