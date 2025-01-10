@@ -18,6 +18,7 @@ export interface CreateUserParams {
   firstname: string;
   tgusername?: string;
   wallet: string;
+  tickets: number;
 }
 
 export interface CreateAttemptParams {

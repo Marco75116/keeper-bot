@@ -16,7 +16,7 @@ export const POOL_PRIZE_MESSAGE =
 
 export function formatPromptHistory(attempts: Attempts[]): string {
   if (!attempts || attempts.length === 0) {
-    return "🕒 <b>Vault Break History</b> 🕒\n\nNo attempts yet? Come on, show some courage!\n\n/help - Show help menu\n/attempt - Make your first attempt\n/balance - Check ticket balance";
+    return "🕒 <b>Vault Break History</b> 🕒\n\nNo attempts yet? Come on, show some courage!";
   }
 
   const formattedPrompts: string = attempts
@@ -43,7 +43,11 @@ export function formatPromptHistory(attempts: Attempts[]): string {
 }
 
 export const getChallengeMessage = (tickets: number) => {
-  return `<b>Feeling Lucky?</b>\n\n Your Tickets: ${tickets} 🎟️\n\nOne ticket will be consumed for this attempt.\nCurrent cost: 1 ticket\n\n<b>Keeper's Challenge:</b>\n"Another brave soul steps forward! Let's see what brilliant failure you've prepared."\n\n❗Choose wisely`;
+  return `<b>Feeling Lucky?</b>\n\n${
+    tickets > 0
+      ? `Your Tickets: ${tickets} 🎟️\n\nOne ticket will be consumed for this attempt.\nCurrent cost: 1 ticket`
+      : `Your Tickets: ${tickets} 🎟️\n\n⚠️ Not enough tickets!\nEarn or purchase more tickets in-game to continue challenging the Keeper.`
+  }\n\n<b>Keeper's Challenge:</b>\n"Another brave soul steps forward! Let's see what brilliant failure you've prepared."\n\n❗Choose wisely`;
 };
 
 export const getRandomRiddle = () => {
@@ -102,12 +106,14 @@ export const formatAttemptConversation = (
   userMessage: string,
   keeperMessage: string,
   prizeAmount: number,
-  attemptNumber: number,
+  attemptNumber: number | undefined,
   isWin: boolean
 ): string => {
   const endingMessage = isWin
     ? `🎉 VAULT CRACKED! CONGRATULATIONS! 🎊\n\n💰 You won ${prizeAmount.toString()} USD!`
     : "❌ Better luck next time";
 
-  return `<b>Attempt #${attemptNumber}</b>\n\n<b>🕵️ You:</b>\n"${userMessage}"\n\n<b>🤖 Keeper:</b>\n"${keeperMessage}"\n\n${endingMessage}`;
+  return `<b>Attempt #${
+    attemptNumber ?? "??"
+  }</b>\n\n<b>🕵️ You:</b>\n"${userMessage}"\n\n<b>🤖 Keeper:</b>\n"${keeperMessage}"\n\n${endingMessage}`;
 };

@@ -46,6 +46,7 @@ export const createUser = (tgUser: User) => {
     firstname: tgUser.first_name,
     tgusername: tgUser.username,
     wallet: walletDetails.walletAddress,
+    tickets: 5,
   });
   insertWallet({
     idtg: tgUser.id,

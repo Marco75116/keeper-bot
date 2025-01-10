@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm";
 import {
   pgTable,
   serial,
@@ -5,16 +6,25 @@ import {
   timestamp,
   integer,
   boolean,
+  check,
 } from "drizzle-orm/pg-core";
 
-export const users = pgTable("users", {
-  id: serial("id").primaryKey(),
-  idtg: integer("idtg").notNull(),
-  firstname: text("firstname").notNull(),
-  tgusername: text("tgusername"),
-  wallet: text("wallet").notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+export const users = pgTable(
+  "users",
+  {
+    id: serial("id").primaryKey(),
+    idtg: integer("idtg").notNull(),
+    firstname: text("firstname").notNull(),
+    tgusername: text("tgusername"),
+    wallet: text("wallet").notNull(),
+    tickets: integer("tickets").notNull().default(0),
+    attempts: integer("attempts").notNull().default(0),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    ticketsCheck: check("tickets_non_negative", sql`${table.tickets} >= 0`),
+  })
+);
 
 export const wallets = pgTable("wallets", {
   id: serial("id").primaryKey(),

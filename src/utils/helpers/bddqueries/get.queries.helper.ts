@@ -4,6 +4,24 @@ import { db } from "../../clients/drizzle.client";
 import { attempts, users } from "../../../db/schema";
 import type { User } from "../../types/global.type";
 
+export const setCachedUser = async (idtg: number): Promise<User | null> => {
+  const userResults = await db
+    .select()
+    .from(users)
+    .where(eq(users.idtg, idtg))
+    .limit(1);
+
+  const user = userResults[0] || null;
+
+  if (user) {
+    await redisClient.set(`user:${idtg}`, JSON.stringify(user), {
+      EX: 300,
+    });
+  }
+
+  return user;
+};
+
 export const getUser = async (idtg: number): Promise<User | null> => {
   try {
     const cachedUser = await redisClient.get(`user:${idtg}`);
@@ -11,21 +29,7 @@ export const getUser = async (idtg: number): Promise<User | null> => {
       return JSON.parse(cachedUser);
     }
 
-    const userResults = await db
-      .select()
-      .from(users)
-      .where(eq(users.idtg, idtg))
-      .limit(1);
-
-    const user = userResults[0] || null;
-
-    if (user) {
-      await redisClient.set(`user:${idtg}`, JSON.stringify(user), {
-        EX: 1200,
-      });
-    }
-
-    return user;
+    return await setCachedUser(idtg);
   } catch (error) {
     console.error(`Error fetching user with idtg ${idtg}:`, error);
     return null;

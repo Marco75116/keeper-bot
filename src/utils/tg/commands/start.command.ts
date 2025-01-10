@@ -23,6 +23,7 @@ import { createUser, handleMessage } from "../../helpers/global.helper";
 import {
   getAttemptsByIdTg,
   getUser,
+  setCachedUser,
 } from "../../helpers/bddqueries/get.queries.helper";
 import {
   KEEPER_HOME_ACTIONS,
@@ -30,7 +31,10 @@ import {
 } from "../actions/global.actions";
 import { redisClient } from "../../clients/redis.client";
 import { getChatId } from "../../helpers/global.helper";
-import { insertAttempt } from "../../helpers/bddqueries/insert.queries.helper";
+import {
+  decrementTickets,
+  insertAttempt,
+} from "../../helpers/bddqueries/insert.queries.helper";
 
 export const botStart = () => {
   bot.on(message("text"), async (ctx) => {
@@ -51,6 +55,10 @@ export const botStart = () => {
       ) {
         const messageId = await redisClient.get(chatIdKey);
         if (messageId) {
+          const passed = await decrementTickets(userId);
+
+          if (!passed.success) return;
+          setCachedUser(userId);
           const sarcasm = getRandomSarcasm();
 
           let isWin = false;
@@ -61,7 +69,7 @@ export const botStart = () => {
             ctx.message.text,
             sarcasm,
             58888,
-            5,
+            passed.attempts,
             isWin
           );
 
@@ -98,9 +106,10 @@ export const botStart = () => {
       createUser(ctx.update.message.from);
     }
 
-    await ctx.reply(WELCOME_MESSAGE, getWelcomeKeyboard());
+    const message = await ctx.reply(WELCOME_MESSAGE, getWelcomeKeyboard());
 
     await ctx.deleteMessage(ctx.update.message.message_id);
+    await redisClient.set(chatIdKey, message.message_id.toString());
   });
 
   bot.action(WELCOME_ACTIONS.CLOSE, async (ctx) => {
@@ -137,7 +146,14 @@ export const botStart = () => {
 
   bot.action(KEEPER_HOME_ACTIONS.CHALLENGE, async (ctx) => {
     await ctx.answerCbQuery();
-    await handleMessage(ctx, getChallengeMessage(3), getChallengeKeyBoard());
+    const user = await getUser(ctx.from.id);
+    if (!user) return;
+
+    await handleMessage(
+      ctx,
+      getChallengeMessage(user.tickets),
+      getChallengeKeyBoard(user.tickets)
+    );
   });
 
   bot.action(KEEPER_HOME_ACTIONS.HOME, async (ctx) => {
