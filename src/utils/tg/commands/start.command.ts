@@ -2,11 +2,9 @@ import { message } from "telegraf/filters";
 import { bot } from "../../clients/telegraf.client";
 import {
   ATTEMPT_PREFIX,
-  formatAttemptConversation,
   formatPromptHistory,
   getChallengeMessage,
   getRandomRiddle,
-  getRandomSarcasm,
   HELP_MESSAGE,
   KEEPER_HOME_MESSAGE,
   POOL_PRIZE_MESSAGE,
@@ -19,11 +17,14 @@ import {
   getKeeperHomeKeyboard,
   getWelcomeKeyboard,
 } from "../keyboards/global.keyboards";
-import { createUser, handleMessage } from "../../helpers/global.helper";
+import {
+  createUser,
+  handleAttempt,
+  handleMessage,
+} from "../../helpers/global.helper";
 import {
   getAttemptsByIdTg,
   getUser,
-  setCachedUser,
 } from "../../helpers/bddqueries/get.queries.helper";
 import {
   KEEPER_HOME_ACTIONS,
@@ -31,16 +32,10 @@ import {
 } from "../actions/global.actions";
 import { redisClient } from "../../clients/redis.client";
 import { getChatId } from "../../helpers/global.helper";
-import {
-  decrementTickets,
-  insertAttempt,
-} from "../../helpers/bddqueries/insert.queries.helper";
 
 export const botStart = () => {
   bot.on(message("text"), async (ctx) => {
     const userId = ctx.from.id;
-    const chatId = ctx.chat.id;
-    const messageId = ctx.message.message_id.toString();
     const chatIdKey = getChatId(ctx.chat.id);
 
     if (ctx.message.reply_to_message) {
@@ -53,49 +48,7 @@ export const botStart = () => {
         status &&
         status === ctx.message.reply_to_message.message_id.toString()
       ) {
-        const messageId = await redisClient.get(chatIdKey);
-        if (messageId) {
-          const passed = await decrementTickets(userId);
-
-          if (!passed.success) return;
-          setCachedUser(userId);
-          const sarcasm = getRandomSarcasm();
-
-          let isWin = false;
-          if (ctx.message.text === "42") {
-            isWin = true;
-          }
-          const postAttempScreen = formatAttemptConversation(
-            ctx.message.text,
-            sarcasm,
-            58888,
-            passed.attempts,
-            isWin
-          );
-
-          insertAttempt({
-            idtg: userId,
-            userPrompt: ctx.message.text,
-            keeperMessage: sarcasm,
-            isWin: isWin,
-          });
-
-          const options: any = {
-            parse_mode: "HTML",
-            link_preview_options: {
-              is_disabled: false,
-            },
-            ...getAttemptKeyBoard(),
-          };
-
-          await bot.telegram.editMessageText(
-            chatId,
-            Number(messageId),
-            undefined,
-            postAttempScreen,
-            options
-          );
-        }
+        await handleAttempt(ctx);
       }
 
       return;
@@ -181,7 +134,7 @@ export const botStart = () => {
       `${ATTEMPT_PREFIX}:${userId}`,
       sentMessage.message_id,
       {
-        EX: 900,
+        EX: 600,
       }
     );
 

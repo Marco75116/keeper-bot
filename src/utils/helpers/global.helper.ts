@@ -2,10 +2,21 @@ import type { InlineKeyboardMarkup, User } from "telegraf/types";
 import type { EncryptedData } from "../types/global.type";
 import { createWallet, faucet } from "./viem.helper";
 import crypto from "crypto";
-import { insertUser, insertWallet } from "./bddqueries/insert.queries.helper";
+import {
+  decrementTickets,
+  insertAttempt,
+  insertUser,
+  insertWallet,
+} from "./bddqueries/insert.queries.helper";
 import { Context, Markup } from "telegraf";
 import { bot } from "../clients/telegraf.client";
 import { redisClient } from "../clients/redis.client";
+import { updateCachedUser } from "./bddqueries/get.queries.helper";
+import {
+  formatAttemptConversation,
+  getRandomSarcasm,
+} from "../constants/messages.constant";
+import { getAttemptKeyBoard } from "../tg/keyboards/global.keyboards";
 
 const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY;
 
@@ -88,4 +99,60 @@ export const handleMessage = async (
 
 export const getChatId = (chatId: number): string => {
   return `chatId-${chatId}`;
+};
+
+export const handleAttempt = async (ctx: any) => {
+  const chatId = ctx.chat.id;
+  const userId = ctx.from.id;
+
+  const chatIdKey = getChatId(ctx.chat.id);
+  const messageId = await redisClient.get(chatIdKey);
+  if (messageId) {
+    const passed = await decrementTickets(userId);
+
+    if (!passed.success) return;
+    if (passed.tickets !== undefined && passed.attempts !== undefined) {
+      await updateCachedUser(userId, {
+        tickets: passed.tickets,
+        attempts: passed.attempts,
+      });
+    }
+
+    const sarcasm = getRandomSarcasm();
+
+    let isWin = false;
+    if (ctx.message.text === "42") {
+      isWin = true;
+    }
+    const postAttempScreen = formatAttemptConversation(
+      ctx.message.text,
+      sarcasm,
+      58888,
+      passed.attempts,
+      isWin
+    );
+
+    insertAttempt({
+      idtg: userId,
+      userPrompt: ctx.message.text,
+      keeperMessage: sarcasm,
+      isWin: isWin,
+    });
+
+    const options: any = {
+      parse_mode: "HTML",
+      link_preview_options: {
+        is_disabled: false,
+      },
+      ...getAttemptKeyBoard(),
+    };
+
+    await bot.telegram.editMessageText(
+      chatId,
+      Number(messageId),
+      undefined,
+      postAttempScreen,
+      options
+    );
+  }
 };

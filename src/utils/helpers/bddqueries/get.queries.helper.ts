@@ -22,6 +22,27 @@ export const setCachedUser = async (idtg: number): Promise<User | null> => {
   return user;
 };
 
+export const updateCachedUser = async (
+  idtg: number,
+  updates: { tickets?: number; attempts?: number }
+) => {
+  try {
+    const cachedUser = await redisClient.get(`user:${idtg}`);
+    if (cachedUser) {
+      const userData = JSON.parse(cachedUser);
+      const updatedUser = {
+        ...userData,
+        ...updates,
+      };
+      await redisClient.set(`user:${idtg}`, JSON.stringify(updatedUser), {
+        EX: 300,
+      });
+    }
+  } catch (error) {
+    console.error("Error updating cached user:", error);
+  }
+};
+
 export const getUser = async (idtg: number): Promise<User | null> => {
   try {
     const cachedUser = await redisClient.get(`user:${idtg}`);
