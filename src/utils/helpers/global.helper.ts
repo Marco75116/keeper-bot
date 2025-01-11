@@ -14,7 +14,10 @@ import {
 import { Context, Markup } from "telegraf";
 import { bot } from "../clients/telegraf.client";
 import { redisClient } from "../clients/redis.client";
-import { updateCachedUser } from "./bddqueries/get.queries.helper";
+import {
+  updateCachedPrizePool,
+  updateCachedUser,
+} from "./bddqueries/get.queries.helper";
 import { formatAttemptConversation } from "../constants/messages.constant";
 import {
   getAttemptKeyBoard,
@@ -162,7 +165,14 @@ export const handleAttempt = async (ctx: any) => {
       return;
     }
 
-    await incrementPoolPrize();
+    const incrementResult = await incrementPoolPrize();
+
+    if (incrementResult.success && incrementResult.data) {
+      await updateCachedPrizePool({
+        amount: incrementResult.data.amount,
+        totalAttempts: incrementResult.data.totalAttempts,
+      });
+    }
 
     let amountPrizePoolWin = 0;
     if (data?.is_secret_discovered) {

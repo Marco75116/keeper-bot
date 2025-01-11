@@ -1,7 +1,6 @@
 import { message } from "telegraf/filters";
 import { bot } from "../../clients/telegraf.client";
 import {
-  ATTEMPT_PREFIX,
   formatPromptHistory,
   getChallengeMessage,
   getPoolPrizeMessage,
@@ -33,6 +32,7 @@ import {
 } from "../actions/global.actions";
 import { redisClient } from "../../clients/redis.client";
 import { getChatId } from "../../helpers/global.helper";
+import { ATTEMPT_PREFIX } from "../../constants/global.constant";
 
 export const botStart = () => {
   bot.on(message("text"), async (ctx) => {
@@ -86,7 +86,7 @@ export const botStart = () => {
     const poolPrize = await getPrizePool();
     await handleMessage(
       ctx,
-      getPoolPrizeMessage(poolPrize[0]),
+      getPoolPrizeMessage(poolPrize.data),
       getKeeperHomeKeyboard()
     );
   });

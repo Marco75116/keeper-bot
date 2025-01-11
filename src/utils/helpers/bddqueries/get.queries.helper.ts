@@ -3,6 +3,7 @@ import { redisClient } from "../../clients/redis.client";
 import { db } from "../../clients/drizzle.client";
 import { attempts, poolPrize, users } from "../../../db/schema";
 import type { User } from "../../types/global.type";
+import { POOL_CACHED_KEY } from "../../constants/global.constant";
 
 export const setCachedUser = async (idtg: number): Promise<User | null> => {
   const userResults = await db
@@ -65,10 +66,70 @@ export const getAttemptsByIdTg = async (idtg: number) => {
     .orderBy(desc(attempts.sentAt));
 };
 
-export const getPrizePool = async () => {
-  return await db
+export const setCachedPrizePool = async () => {
+  const result = await db
     .select()
     .from(poolPrize)
     .where(isNull(poolPrize.winDate))
     .limit(1);
+
+  const activePrizePool = result[0] || null;
+
+  if (activePrizePool) {
+    await redisClient.set(POOL_CACHED_KEY, JSON.stringify(activePrizePool), {
+      EX: 300,
+    });
+  }
+
+  return activePrizePool;
+};
+
+export const updateCachedPrizePool = async (updates: {
+  amount?: string;
+  totalAttempts?: number;
+}) => {
+  try {
+    const cachedPool = await redisClient.get(POOL_CACHED_KEY);
+    if (cachedPool) {
+      const poolData = JSON.parse(cachedPool);
+      const updatedPool = {
+        ...poolData,
+        ...updates,
+      };
+      await redisClient.set(POOL_CACHED_KEY, JSON.stringify(updatedPool), {
+        EX: 300,
+      });
+    }
+  } catch (error) {
+    console.error("Error updating cached prize pool:", error);
+  }
+};
+
+export const getPrizePool = async () => {
+  try {
+    const cachedPool = await redisClient.get(POOL_CACHED_KEY);
+    if (cachedPool) {
+      const parsed = JSON.parse(cachedPool);
+      return {
+        success: true,
+        data: {
+          ...parsed,
+          amount: Number(parsed.amount),
+          createdAt: new Date(parsed.createdAt),
+        },
+      };
+    }
+
+    const pool = await setCachedPrizePool();
+    return {
+      success: true,
+      data: pool,
+    };
+  } catch (error) {
+    console.error("Error fetching prize pool:", error);
+    return {
+      success: false,
+      error: error,
+    };
+  }
 };

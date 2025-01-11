@@ -96,8 +96,6 @@ export const getRandomRiddle = () => {
   return `<b>Keeper's Riddle Challenge</b> 🧩\n\n<b>The Riddle:</b>\n"${selectedRiddle.riddle}"\n\n<b>Keeper's Taunt:</b>\n"Puzzle this one out if you can, mortal. Your previous attempts were... amusing."\n\n⚠️ Choose wisely, each mistake feeds my vault`;
 };
 
-export const ATTEMPT_PREFIX = "attempt";
-
 export const getRandomSarcasm = (): string => {
   const sarcasmPool: string[] = [
     "Ha! Is that your best shot?",
