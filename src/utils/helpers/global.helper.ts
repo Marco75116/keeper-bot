@@ -3,10 +3,13 @@ import type { EncryptedData } from "../types/global.type";
 import { createWallet, faucet } from "./viem.helper";
 import crypto from "crypto";
 import {
+  createPrizePool,
   decrementTickets,
+  incrementPoolPrize,
   insertAttempt,
   insertUser,
   insertWallet,
+  updatePoolPrizeWinner,
 } from "./bddqueries/insert.queries.helper";
 import { Context, Markup } from "telegraf";
 import { bot } from "../clients/telegraf.client";
@@ -119,15 +122,25 @@ export const handleAttempt = async (ctx: any) => {
     }
 
     const sarcasm = getRandomSarcasm();
+    incrementPoolPrize();
 
     let isWin = false;
     if (ctx.message.text === "42") {
       isWin = true;
     }
+    let amountPrizePoolWin = 0;
+    if (isWin) {
+      const returnPrizePoolWin = await updatePoolPrizeWinner(userId);
+      amountPrizePoolWin = Number(returnPrizePoolWin.data?.amount);
+      console.log(`User ${userId} won the prize pool!`);
+      const createdPool = await createPrizePool();
+      console.log("Prize pool created:", createdPool.data?.id);
+    }
+
     const postAttempScreen = formatAttemptConversation(
       ctx.message.text,
       sarcasm,
-      58888,
+      amountPrizePoolWin,
       passed.attempts,
       isWin
     );

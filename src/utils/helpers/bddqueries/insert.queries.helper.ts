@@ -1,4 +1,4 @@
-import { eq, sql } from "drizzle-orm";
+import { eq, isNull, sql } from "drizzle-orm";
 import { attempts, poolPrize, users, wallets } from "../../../db/schema";
 import { db } from "../../clients/drizzle.client";
 import type {
@@ -80,6 +80,60 @@ export const createPrizePool = async () => {
     const result = await db.insert(poolPrize).values({}).returning({
       id: poolPrize.id,
     });
+
+    return {
+      success: true,
+      data: result[0],
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error,
+    };
+  }
+};
+
+export const incrementPoolPrize = async () => {
+  try {
+    const result = await db
+      .update(poolPrize)
+      .set({
+        amount: sql`${poolPrize.amount} + 0.56`,
+        totalAttempts: sql`${poolPrize.totalAttempts} + 1`,
+      })
+      .where(isNull(poolPrize.winDate))
+      .returning({
+        amount: poolPrize.amount,
+        totalAttempts: poolPrize.totalAttempts,
+      });
+
+    return {
+      success: true,
+      data: result[0],
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error,
+    };
+  }
+};
+
+export const updatePoolPrizeWinner = async (idtgWinner: number) => {
+  try {
+    const result = await db
+      .update(poolPrize)
+      .set({
+        idtgWinner: idtgWinner,
+        winDate: new Date(),
+      })
+      .where(isNull(poolPrize.winDate))
+      .returning({
+        id: poolPrize.id,
+        amount: poolPrize.amount,
+        idtgWinner: poolPrize.idtgWinner,
+        winDate: poolPrize.winDate,
+      });
 
     return {
       success: true,

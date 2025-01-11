@@ -50,5 +50,6 @@ export const poolPrize = pgTable("pool_prize", {
   amount: numeric("amount").notNull().default("0"),
   totalAttempts: integer("total_attempts").notNull().default(0),
   winDate: timestamp("win_date"),
+  idtgWinner: bigint("idtg_winner", { mode: "number" }), // Added mode configuration
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
