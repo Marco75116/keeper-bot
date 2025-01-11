@@ -16,7 +16,10 @@ import { bot } from "../clients/telegraf.client";
 import { redisClient } from "../clients/redis.client";
 import { updateCachedUser } from "./bddqueries/get.queries.helper";
 import { formatAttemptConversation } from "../constants/messages.constant";
-import { getAttemptKeyBoard } from "../tg/keyboards/global.keyboards";
+import {
+  getAttemptKeyBoard,
+  getEmptyKeyBoard,
+} from "../tg/keyboards/global.keyboards";
 import { URL_KEEPER } from "../constants/global.constant";
 
 const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY;
@@ -108,10 +111,11 @@ export const handleAttempt = async (ctx: any) => {
 
   const chatIdKey = getChatId(ctx.chat.id);
   const messageId = await redisClient.get(chatIdKey);
+
   if (messageId) {
     const passed = await decrementTickets(userId);
-
     if (!passed.success) return;
+
     if (passed.tickets !== undefined && passed.attempts !== undefined) {
       await updateCachedUser(userId, {
         tickets: passed.tickets,
@@ -119,14 +123,46 @@ export const handleAttempt = async (ctx: any) => {
       });
     }
 
+    let isProcessing = true;
+    const loadingStates = [
+      "🤖 Keeper is thinking...",
+      "⚡ Analyzing your answer...",
+    ];
+
+    const loadingLoop = async () => {
+      let i = 0;
+      while (isProcessing) {
+        const options: any = {
+          parse_mode: "HTML",
+          ...getEmptyKeyBoard(),
+        };
+
+        await bot.telegram.editMessageText(
+          chatId,
+          Number(messageId),
+          undefined,
+          loadingStates[i % loadingStates.length],
+          options
+        );
+
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        i++;
+      }
+    };
+
+    const loadingPromise = loadingLoop();
+
     const { data, success, error } = await sendChatMessage(ctx.message.text);
+
+    isProcessing = false;
+    await loadingPromise;
 
     if (!success || !data) {
       console.error("Chat API error:", error);
       return;
     }
 
-    incrementPoolPrize();
+    await incrementPoolPrize();
 
     let amountPrizePoolWin = 0;
     if (data?.is_secret_discovered) {
@@ -145,7 +181,7 @@ export const handleAttempt = async (ctx: any) => {
       data.is_secret_discovered
     );
 
-    insertAttempt({
+    await insertAttempt({
       idtg: userId,
       userPrompt: ctx.message.text,
       keeperMessage: data.response,
