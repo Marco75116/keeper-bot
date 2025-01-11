@@ -1,7 +1,7 @@
-import { desc, eq } from "drizzle-orm";
+import { desc, eq, isNull } from "drizzle-orm";
 import { redisClient } from "../../clients/redis.client";
 import { db } from "../../clients/drizzle.client";
-import { attempts, users } from "../../../db/schema";
+import { attempts, poolPrize, users } from "../../../db/schema";
 import type { User } from "../../types/global.type";
 
 export const setCachedUser = async (idtg: number): Promise<User | null> => {
@@ -63,4 +63,12 @@ export const getAttemptsByIdTg = async (idtg: number) => {
     .from(attempts)
     .where(eq(attempts.idtg, idtg))
     .orderBy(desc(attempts.sentAt));
+};
+
+export const getPrizePool = async () => {
+  return await db
+    .select()
+    .from(poolPrize)
+    .where(isNull(poolPrize.winDate))
+    .limit(1);
 };

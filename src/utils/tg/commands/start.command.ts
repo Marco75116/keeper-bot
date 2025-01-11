@@ -4,10 +4,10 @@ import {
   ATTEMPT_PREFIX,
   formatPromptHistory,
   getChallengeMessage,
+  getPoolPrizeMessage,
   getRandomRiddle,
   HELP_MESSAGE,
   KEEPER_HOME_MESSAGE,
-  POOL_PRIZE_MESSAGE,
   WELCOME_MESSAGE,
 } from "../../constants/messages.constant";
 import {
@@ -24,6 +24,7 @@ import {
 } from "../../helpers/global.helper";
 import {
   getAttemptsByIdTg,
+  getPrizePool,
   getUser,
 } from "../../helpers/bddqueries/get.queries.helper";
 import {
@@ -82,7 +83,12 @@ export const botStart = () => {
 
   bot.action(KEEPER_HOME_ACTIONS.POOLPRIZE, async (ctx) => {
     await ctx.answerCbQuery();
-    await handleMessage(ctx, POOL_PRIZE_MESSAGE, getKeeperHomeKeyboard());
+    const poolPrize = await getPrizePool();
+    await handleMessage(
+      ctx,
+      getPoolPrizeMessage(poolPrize[0]),
+      getKeeperHomeKeyboard()
+    );
   });
 
   bot.action(KEEPER_HOME_ACTIONS.PROMPTS, async (ctx) => {

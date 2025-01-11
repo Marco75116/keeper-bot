@@ -1,5 +1,5 @@
 import { eq, sql } from "drizzle-orm";
-import { attempts, users, wallets } from "../../../db/schema";
+import { attempts, poolPrize, users, wallets } from "../../../db/schema";
 import { db } from "../../clients/drizzle.client";
 import type {
   CreateAttemptParams,
@@ -47,6 +47,7 @@ export const insertAttempt = async (params: CreateAttemptParams) => {
     })
     .returning();
 };
+
 export const decrementTickets = async (idtg: number) => {
   try {
     const result = await db
@@ -65,6 +66,24 @@ export const decrementTickets = async (idtg: number) => {
       success: true,
       tickets: result[0].tickets,
       attempts: result[0].attempts,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error,
+    };
+  }
+};
+
+export const createPrizePool = async () => {
+  try {
+    const result = await db.insert(poolPrize).values({}).returning({
+      id: poolPrize.id,
+    });
+
+    return {
+      success: true,
+      data: result[0],
     };
   } catch (error) {
     return {

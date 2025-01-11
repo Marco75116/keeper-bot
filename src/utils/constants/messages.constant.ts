@@ -1,4 +1,4 @@
-import type { Attempts } from "../types/global.type";
+import type { Attempts, PoolPrize } from "../types/global.type";
 
 export const WELCOME_MESSAGE = `Welcome to Yum Party! 🍭
 The taps are over—now it's all about skills! 💥
@@ -11,9 +11,22 @@ The Vault Breaker Giveaway introduces an exciting new event reward, complementin
 export const HELP_MESSAGE =
   "<b>Welcome to the Vault Breaker Giveaway!</b> 🔒\n\nThink you have what it takes to crack the vault? Here's what you need to know, mortal:\n\n<b>How to Participate:</b>\n1. Purchase tickets\n2. Follow our social accounts and pay attention to Chocolate, Lollipop, Marshmallow, and Cookie - they drop crucial clues\n3. Send me your prompts here on Telegram\n\nBe clever, be persistent - the vault doesn't open for just anyone\n\n<b>Important Rules:</b>\n• Each prompt attempt requires spending one ticket\n• Tickets are purchased through the Yum's token\n• The prize pool grows with each ticket spent\n\nThink you've got what it takes? Prove it. 🔐 ";
 
-export const POOL_PRIZE_MESSAGE =
-  "💰 <b>Prize Vault Status</b> 💰\n\n<b>Locked Inside:</b> $88,000 USD\n<b>Growth Rate:</b> +56770 per ticket\n\n<b>Keeper's Vault:</b>\nThe prize grows with every failure! Keep feeding your tickets to my vault, humans. Someone might crack it... eventually.\n\n🔥 Prize increases with each attempt\n⚡ One winner takes everything";
+export const getPoolPrizeMessage = (prizePool: PoolPrize) => {
+  const formattedAmount = Number(prizePool.amount).toLocaleString();
+  const formattedDate = prizePool.createdAt.toLocaleDateString();
 
+  return (
+    `💰 <b>Prize Vault Status</b> 💰\n\n` +
+    `<b>Prize Pool #${prizePool.id}</b>\n\n` +
+    `<b>Established:</b> ${formattedDate}\n\n` +
+    `<b>Locked Inside:</b> $ ${formattedAmount} USD\n` +
+    `<b>Failed Attempts:</b> ${prizePool.totalAttempts.toLocaleString()}\n\n` +
+    `<b>Keeper's Vault:</b>\n` +
+    `The prize grows with every failure! Keep feeding your tickets to my vault, humans. Someone might crack it... eventually.\n\n` +
+    `🔥 Prize increases with each attempt\n` +
+    `⚡ One winner takes everything`
+  );
+};
 export function formatPromptHistory(attempts: Attempts[]): string {
   if (!attempts || attempts.length === 0) {
     return "🕒 <b>Vault Break History</b> 🕒\n\nNo attempts yet? Come on, show some courage!";

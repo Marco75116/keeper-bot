@@ -8,6 +8,7 @@ import {
   boolean,
   check,
   bigint,
+  numeric,
 } from "drizzle-orm/pg-core";
 
 export const users = pgTable(
@@ -42,4 +43,12 @@ export const attempts = pgTable("attempts", {
   keeperMessage: text("keeper_message").notNull(),
   isWin: boolean("is_win").notNull().default(false),
   sentAt: timestamp("sent_at").defaultNow().notNull(),
+});
+
+export const poolPrize = pgTable("pool_prize", {
+  id: serial("id").primaryKey(),
+  amount: numeric("amount").notNull().default("0"),
+  totalAttempts: integer("total_attempts").notNull().default(0),
+  winDate: timestamp("win_date"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 });
