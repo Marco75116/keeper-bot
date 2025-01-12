@@ -28,3 +28,8 @@ export interface CreateAttemptParams {
   keeperMessage: string;
   isWin: boolean;
 }
+
+export interface BuyConstructor {
+  network: string;
+  amount: string;
+}

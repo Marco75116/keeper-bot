@@ -1,5 +1,6 @@
 import { Markup } from "telegraf";
 import {
+  BUY_ACTIONS,
   KEEPER_HOME_ACTIONS,
   WELCOME_ACTIONS,
 } from "../actions/global.actions";
@@ -65,6 +66,31 @@ export const getAttemptKeyBoard = () => {
   return Markup.inlineKeyboard([
     [
       Markup.button.callback("⬅️ Back", KEEPER_HOME_ACTIONS.CHALLENGE),
+      Markup.button.callback("✕ Close", KEEPER_HOME_ACTIONS.CLOSE),
+    ],
+  ]);
+};
+
+export const getBuyKeyboard = () => {
+  return Markup.inlineKeyboard([
+    [
+      Markup.button.callback("🌿 TON", BUY_ACTIONS.TON),
+      Markup.button.callback("🌉 Solana", BUY_ACTIONS.SOLANA),
+    ],
+    [
+      Markup.button.callback(
+        "🔢 SELECT AN AMOUNT 🔢",
+        BUY_ACTIONS.SELECTANAMOUNT
+      ),
+    ],
+    [
+      Markup.button.callback("1", BUY_ACTIONS.ONE),
+      Markup.button.callback("5", BUY_ACTIONS.FIVE),
+      Markup.button.callback("✏️ Custom", BUY_ACTIONS.AMOUNT),
+    ],
+    [Markup.button.callback("✅ CONFIRMATION", BUY_ACTIONS.CONFIRMATION)],
+    [
+      Markup.button.callback("⬅️ Back", KEEPER_HOME_ACTIONS.HOME),
       Markup.button.callback("✕ Close", KEEPER_HOME_ACTIONS.CLOSE),
     ],
   ]);

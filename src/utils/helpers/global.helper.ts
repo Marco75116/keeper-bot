@@ -1,5 +1,5 @@
 import type { InlineKeyboardMarkup, User } from "telegraf/types";
-import type { EncryptedData } from "../types/global.type";
+import type { BuyConstructor, EncryptedData } from "../types/global.type";
 import { createWallet, faucet } from "./viem.helper";
 import crypto from "crypto";
 import {
@@ -18,12 +18,17 @@ import {
   updateCachedPrizePool,
   updateCachedUser,
 } from "./bddqueries/get.queries.helper";
-import { formatAttemptConversation } from "../constants/messages.constant";
+import {
+  formatAttemptConversation,
+  getBuyMessage,
+} from "../constants/messages.constant";
 import {
   getAttemptKeyBoard,
+  getBuyKeyboard,
   getEmptyKeyBoard,
 } from "../tg/keyboards/global.keyboards";
-import { URL_KEEPER } from "../constants/global.constant";
+import { buyConstructorEmpty, URL_KEEPER } from "../constants/global.constant";
+import { buy_PREFIX } from "../tg/actions/global.actions";
 
 const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY;
 
@@ -78,22 +83,30 @@ export const createUser = (tgUser: User) => {
 export const handleMessage = async (
   ctx: Context,
   text: string,
-  keyBoard: Markup.Markup<InlineKeyboardMarkup>
+  keyBoard: Markup.Markup<InlineKeyboardMarkup>,
+  message_id?: number
 ) => {
   try {
     const chatId = ctx.chat?.id;
+    const options: any = {
+      parse_mode: "HTML",
+      link_preview_options: {
+        is_disabled: true,
+      },
+      ...keyBoard,
+    };
     if ("callback_query" in ctx.update && ctx.update.callback_query.message) {
-      const options: any = {
-        parse_mode: "HTML",
-        link_preview_options: {
-          is_disabled: true,
-        },
-        ...keyBoard,
-      };
-
       await bot.telegram.editMessageText(
         chatId,
         ctx.update.callback_query.message.message_id,
+        undefined,
+        text,
+        options
+      );
+    } else if (message_id) {
+      await bot.telegram.editMessageText(
+        chatId,
+        message_id,
         undefined,
         text,
         options
@@ -106,6 +119,27 @@ export const handleMessage = async (
 
 export const getChatId = (chatId: number): string => {
   return `chatId-${chatId}`;
+};
+
+export const handleBuyCustom = async (ctx: any) => {
+  const amount = ctx.message.text.trim();
+  const numAmount = Number(amount);
+
+  if (isNaN(numAmount) || numAmount <= 0) {
+    return;
+  }
+
+  const buyObject = await handleSetAmountBuyAction(ctx.from.id, numAmount);
+
+  const chatIdKey = getChatId(ctx.chat.id);
+  const messageId = await redisClient.get(chatIdKey);
+
+  await handleMessage(
+    ctx,
+    getBuyMessage(buyObject),
+    getBuyKeyboard(),
+    Number(messageId)
+  );
 };
 
 export const handleAttempt = async (ctx: any) => {
@@ -259,4 +293,40 @@ export const sendChatMessage = async (message: string): Promise<ChatResult> => {
 
 export const getLink = (text: string, link: string) => {
   return `<b><a href="${link}">${text}</a></b>`;
+};
+
+export const handleSetAmountBuyAction = async (
+  userId: number,
+  amount: number
+): Promise<BuyConstructor> => {
+  const buyObjectString = await redisClient.get(`${buy_PREFIX}:${userId}`);
+  if (!buyObjectString) return buyConstructorEmpty;
+  const buytokenObject: BuyConstructor = JSON.parse(buyObjectString);
+
+  buytokenObject.amount = String(amount);
+
+  await redisClient.set(
+    `${buy_PREFIX}:${userId}`,
+    JSON.stringify(buytokenObject)
+  );
+
+  return buytokenObject;
+};
+
+export const handleSetNetworkBuyAction = async (
+  userId: number,
+  network: string
+): Promise<BuyConstructor> => {
+  const buyObjectString = await redisClient.get(`${buy_PREFIX}:${userId}`);
+  if (!buyObjectString) return buyConstructorEmpty;
+  const buytokenObject: BuyConstructor = JSON.parse(buyObjectString);
+
+  buytokenObject.network = network;
+
+  await redisClient.set(
+    `${buy_PREFIX}:${userId}`,
+    JSON.stringify(buytokenObject)
+  );
+
+  return buytokenObject;
 };

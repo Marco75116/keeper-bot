@@ -1,5 +1,5 @@
 import { getLink } from "../helpers/global.helper";
-import type { Attempts, PoolPrize } from "../types/global.type";
+import type { Attempts, BuyConstructor, PoolPrize } from "../types/global.type";
 
 export const WELCOME_MESSAGE = `Welcome to Yum Party! 🍭
 The taps are over—now it's all about skills! 💥
@@ -136,18 +136,34 @@ export const getWalletsMessage = (wallet: string): string => {
 
   let msg = `
 <b>Your Wallet Overview</b>
-  
-🔑 <b>Address:</b>
-<code>${wallet}</code>
+
+💰<b>Total Value:</b> $1,920
+
   
 🌐 <b>Networks Overview:</b>
   
+🔑 <b>Address:</b>
+<code>${wallet}</code>
 • 🌿 ${tonLink} : 2.12 TON  
-• 🌉 ${solLink} : 1.34 SOL  
 
-💰<b>Total Value:</b> $1,920
+🔑 <b>Address:</b>
+<code>${wallet}</code>
+• 🌉 ${solLink} : 1.34 SOL  
   
 `;
+
+  return msg;
+};
+
+export const getBuyMessage = (params: BuyConstructor) => {
+  const { network, amount } = params;
+
+  const formatValue = (value: string) => value?.trim() || "...";
+
+  let msg = `➡️ <b>BUY DETAILS</b>\n\n`;
+  msg += `🌐 <b>Network:</b> ${formatValue(network)}\n`;
+  msg += `🎟️ <b>Amount:</b> ${formatValue(amount)}\n\n`;
+  msg += `Please review the purchase details carefully. Once confirmed, the transfer will be initiated. 🔐`;
 
   return msg;
 };
