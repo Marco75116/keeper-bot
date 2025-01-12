@@ -1,3 +1,4 @@
+import { getLink } from "../helpers/global.helper";
 import type { Attempts, PoolPrize } from "../types/global.type";
 
 export const WELCOME_MESSAGE = `Welcome to Yum Party! 🍭
@@ -127,4 +128,26 @@ export const formatAttemptConversation = (
   return `<b>Attempt #${
     attemptNumber ?? "??"
   }</b>\n\n<b>🕵️ You:</b>\n"${userMessage}"\n\n<b>🤖 Keeper:</b>\n"${keeperMessage}"\n\n${endingMessage}`;
+};
+
+export const getWalletsMessage = (wallet: string): string => {
+  const tonLink = getLink("Ton", `https://tonscan.org/address/${wallet}`);
+  const solLink = getLink("Solana", `https://solscan.io/account/${wallet}`);
+
+  let msg = `
+<b>Your Wallet Overview</b>
+  
+🔑 <b>Address:</b>
+<code>${wallet}</code>
+  
+🌐 <b>Networks Overview:</b>
+  
+• 🌿 ${tonLink} : 2.12 TON  
+• 🌉 ${solLink} : 1.34 SOL  
+
+💰<b>Total Value:</b> $1,920
+  
+`;
+
+  return msg;
 };

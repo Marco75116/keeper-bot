@@ -13,4 +13,6 @@ export const KEEPER_HOME_ACTIONS = {
   PROMPTS: "prompts",
   CLOSE: "close",
   ATTEMPT: "attempt",
+  WALLET: "wallet",
+  BUY: "buy",
 };

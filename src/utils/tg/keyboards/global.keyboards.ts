@@ -30,13 +30,17 @@ export const getKeeperHomeKeyboard = () => {
   return Markup.inlineKeyboard([
     [
       Markup.button.callback(
-        "🎟️ Challenge Keeper",
+        "🎯 Challenge Keeper",
         KEEPER_HOME_ACTIONS.CHALLENGE
       ),
     ],
     [
       Markup.button.callback("💰 Pool Prize", KEEPER_HOME_ACTIONS.POOLPRIZE),
       Markup.button.callback("📜 Prompts", KEEPER_HOME_ACTIONS.PROMPTS),
+    ],
+    [
+      Markup.button.callback("⛓️ Wallet", KEEPER_HOME_ACTIONS.WALLET),
+      Markup.button.callback("🎟️ Buy Ticket", KEEPER_HOME_ACTIONS.BUY),
     ],
     [Markup.button.callback("🙋‍♂️ Help", KEEPER_HOME_ACTIONS.HELP)],
     [Markup.button.callback("✕ Close", KEEPER_HOME_ACTIONS.CLOSE)],

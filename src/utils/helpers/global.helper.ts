@@ -256,3 +256,7 @@ export const sendChatMessage = async (message: string): Promise<ChatResult> => {
     };
   }
 };
+
+export const getLink = (text: string, link: string) => {
+  return `<b><a href="${link}">${text}</a></b>`;
+};

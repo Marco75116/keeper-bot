@@ -5,6 +5,7 @@ import {
   getChallengeMessage,
   getPoolPrizeMessage,
   getRandomRiddle,
+  getWalletsMessage,
   HELP_MESSAGE,
   KEEPER_HOME_MESSAGE,
   WELCOME_MESSAGE,
@@ -145,5 +146,18 @@ export const botStart = () => {
     );
 
     await handleMessage(ctx, getRandomRiddle(), getAttemptKeyBoard());
+  });
+
+  bot.action(KEEPER_HOME_ACTIONS.WALLET, async (ctx) => {
+    await ctx.answerCbQuery();
+    const user = await getUser(ctx.from.id);
+
+    if (!user) return;
+
+    await handleMessage(
+      ctx,
+      getWalletsMessage(user.wallet),
+      getKeeperHomeKeyboard()
+    );
   });
 };
