@@ -116,16 +116,6 @@ export const handleAttempt = async (ctx: any) => {
   const messageId = await redisClient.get(chatIdKey);
 
   if (messageId) {
-    const passed = await decrementTickets(userId);
-    if (!passed.success) return;
-
-    if (passed.tickets !== undefined && passed.attempts !== undefined) {
-      await updateCachedUser(userId, {
-        tickets: passed.tickets,
-        attempts: passed.attempts,
-      });
-    }
-
     let isProcessing = true;
     const loadingStates = [
       "🤖 Keeper is thinking...",
@@ -163,6 +153,16 @@ export const handleAttempt = async (ctx: any) => {
     if (!success || !data) {
       console.error("Chat API error:", error);
       return;
+    }
+
+    const passed = await decrementTickets(userId);
+    if (!passed.success) return;
+
+    if (passed.tickets !== undefined && passed.attempts !== undefined) {
+      await updateCachedUser(userId, {
+        tickets: passed.tickets,
+        attempts: passed.attempts,
+      });
     }
 
     const incrementResult = await incrementPoolPrize();
