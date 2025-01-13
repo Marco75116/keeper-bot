@@ -4,6 +4,7 @@ import {
   KEEPER_HOME_ACTIONS,
   WELCOME_ACTIONS,
 } from "../actions/global.actions";
+import { YUM_CHANNEL, YUM_GAME } from "../../constants/global.constant";
 
 export const getEmptyKeyBoard = () => {
   return Markup.inlineKeyboard([]);
@@ -11,19 +12,14 @@ export const getEmptyKeyBoard = () => {
 
 export const getWelcomeKeyboard = () => {
   return Markup.inlineKeyboard([
-    [Markup.button.callback("🃏 Play Yum's Bar", WELCOME_ACTIONS.PLAY)],
+    [Markup.button.url("🃏 Play Yum's Bar", YUM_GAME)],
     [
       Markup.button.callback(
         "🎁 Vault Breaker Giveaway - Challenge Keeper",
         WELCOME_ACTIONS.KEEPER
       ),
     ],
-    [
-      Markup.button.callback(
-        "📢 Subscribe for Updates",
-        WELCOME_ACTIONS.SUBSCRIBE
-      ),
-    ],
+    [Markup.button.url("📢 Subscribe for Updates", YUM_CHANNEL)],
     [Markup.button.callback("✕ Close", WELCOME_ACTIONS.CLOSE)],
   ]);
 };

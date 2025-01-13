@@ -12,3 +12,7 @@ export const buyConstructorEmpty: BuyConstructor = {
   network: "",
   amount: "",
 };
+
+export const YUM_CHANNEL = "https://t.me/yumparty_official";
+
+export const YUM_GAME = "https://t.me/yumparty_bot/yumbar";
