@@ -16,3 +16,6 @@ export const buyConstructorEmpty: BuyConstructor = {
 export const YUM_CHANNEL = "https://t.me/yumparty_official";
 
 export const YUM_GAME = "https://t.me/yumparty_bot/yumbar";
+
+export const TON_ENDPOINT = "https://toncenter.com/api/v2/jsonRPC";
+export const TON_DECIMALS = 9;

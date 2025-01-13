@@ -130,9 +130,13 @@ export const formatAttemptConversation = (
   }</b>\n\n<b>🕵️ You:</b>\n"${userMessage}"\n\n<b>🤖 Keeper:</b>\n"${keeperMessage}"\n\n${endingMessage}`;
 };
 
-export const getWalletsMessage = (wallet: string): string => {
-  const tonLink = getLink("Ton", `https://tonscan.org/address/${wallet}`);
-  const solLink = getLink("Solana", `https://solscan.io/account/${wallet}`);
+export const getWalletsMessage = (
+  tonWallet: string,
+  solWallet: string,
+  tonBalance: number
+): string => {
+  const tonLink = getLink("Ton", `https://tonscan.org/address/${tonWallet}`);
+  const solLink = getLink("Solana", `https://solscan.io/account/${solWallet}`);
 
   let msg = `
 <b>Your Wallet Overview</b>
@@ -143,11 +147,11 @@ export const getWalletsMessage = (wallet: string): string => {
 🌐 <b>Networks Overview:</b>
   
 🔑 <b>Address:</b>
-<code>${wallet}</code>
-• 🌿 ${tonLink} : 2.12 TON  
+<code>${tonWallet}</code>
+• 🌿 ${tonLink} : ${tonBalance.toFixed(2)} TON  
 
 🔑 <b>Address:</b>
-<code>${wallet}</code>
+<code>${solWallet}</code>
 • 🌉 ${solLink} : 1.34 SOL  
   
 `;

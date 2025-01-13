@@ -47,6 +47,7 @@ import {
   buyConstructorEmpty,
 } from "../../constants/global.constant";
 import type { BuyConstructor } from "../../types/global.type";
+import { getTONBalance } from "../../helpers/ton.helper";
 
 export const botStart = () => {
   bot.on("pre_checkout_query", async (ctx) => {
@@ -197,10 +198,13 @@ export const botStart = () => {
     const user = await getUser(ctx.from.id);
 
     if (!user) return;
+    const tonWallet = "UQC6i1Jh0oy2NMQF_kWTZaT57bxvuqUDZ462GfohVQqFMCSn";
+
+    const tonBalance = await getTONBalance(tonWallet);
 
     await handleMessage(
       ctx,
-      getWalletsMessage(user.wallet),
+      getWalletsMessage(tonWallet, user.wallet, tonBalance),
       getKeeperHomeKeyboard()
     );
   });
