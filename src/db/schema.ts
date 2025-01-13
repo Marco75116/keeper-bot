@@ -9,6 +9,8 @@ import {
   check,
   bigint,
   numeric,
+  index,
+  varchar,
 } from "drizzle-orm/pg-core";
 
 export const users = pgTable(
@@ -53,3 +55,59 @@ export const poolPrize = pgTable("pool_prize", {
   idtgWinner: bigint("idtg_winner", { mode: "number" }), // Added mode configuration
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
+
+export const cashierWalletSol = pgTable(
+  "cashier_wallet_sol",
+  {
+    publicKey: text("publicKey").notNull().primaryKey(),
+
+    userId: integer("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" })
+      .unique(),
+
+    encryptedPrivateKeyData: varchar("encryptedPrivateKeyData", {
+      length: 500,
+    }).notNull(),
+
+    encryptedPrivateKeyIv: text("encryptedPrivateKeyIv").notNull(),
+
+    deployed: boolean("deployed").default(false),
+
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+
+    updatedAt: timestamp("updated_at").notNull().defaultNow(),
+  },
+  (table) => ({
+    userIdIdx: index("sol_userId_idx").on(table.userId),
+  })
+);
+
+export const cashierWalletTon = pgTable(
+  "cashier_wallet_ton",
+  {
+    publicKey: text("publicKey").notNull().primaryKey(),
+
+    userId: integer("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" })
+      .unique(),
+
+    encryptedPrivateKeyData: varchar("encryptedPrivateKeyData", {
+      length: 500,
+    }).notNull(),
+
+    encryptedPrivateKeyIv: text("encryptedPrivateKeyIv").notNull(),
+
+    address: text("address").notNull(),
+
+    deployed: boolean("deployed").default(false),
+
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+
+    updatedAt: timestamp("updated_at").notNull().defaultNow(),
+  },
+  (table) => ({
+    userIdIdx: index("ton_userId_idx").on(table.userId),
+  })
+);
