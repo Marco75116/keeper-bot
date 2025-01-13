@@ -1,4 +1,5 @@
-import { Address } from "@ton/ton";
+import { Address, WalletContractV5R1 } from "@ton/ton";
+import { mnemonicToPrivateKey, mnemonicNew } from "@ton/crypto";
 import { tonClient } from "../clients/ton.client";
 import { TON_DECIMALS } from "../constants/global.constant";
 
@@ -11,5 +12,21 @@ export const getTONBalance = async (addressString: string) => {
   } catch (error) {
     console.error("Error fetching balance:", error);
     throw error;
+  }
+};
+
+export const createTONWalletV5 = async () => {
+  try {
+    const mnemonic = await mnemonicNew();
+    const { publicKey, secretKey } = await mnemonicToPrivateKey(mnemonic);
+    const wallet = WalletContractV5R1.create({
+      publicKey: publicKey,
+      workchain: 0,
+    });
+    const contract = tonClient.open(wallet);
+
+    return { wallet, contract, secretKey };
+  } catch (error) {
+    console.error("Error creating Wallet:", error);
   }
 };
