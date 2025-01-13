@@ -25,4 +25,5 @@ export const BUY_ACTIONS = {
   SELECTANAMOUNT: `${buy_PREFIX}-selectanamount`,
   ONE: `${buy_PREFIX}-one`,
   FIVE: `${buy_PREFIX}-FIVE`,
+  SEND_STARS: `${buy_PREFIX}-send_stars`,
 };

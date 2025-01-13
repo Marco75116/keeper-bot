@@ -1,7 +1,11 @@
 import type { InlineKeyboardMarkup, User } from "telegraf/types";
-import type { BuyConstructor, EncryptedData } from "../types/global.type";
+import type {
+  BuyConstructor,
+  EncryptedData,
+  NetworkType,
+} from "../types/global.type";
 import { createWallet, faucet } from "./viem.helper";
-import crypto from "crypto";
+import crypto, { randomUUID } from "crypto";
 import {
   createPrizePool,
   decrementTickets,
@@ -315,7 +319,7 @@ export const handleSetAmountBuyAction = async (
 
 export const handleSetNetworkBuyAction = async (
   userId: number,
-  network: string
+  network: NetworkType
 ): Promise<BuyConstructor> => {
   const buyObjectString = await redisClient.get(`${buy_PREFIX}:${userId}`);
   if (!buyObjectString) return buyConstructorEmpty;
@@ -330,3 +334,28 @@ export const handleSetNetworkBuyAction = async (
 
   return buytokenObject;
 };
+
+export async function createInvoiceLink(
+  telegraf: Context<any>,
+  amountTicket: number
+) {
+  const productLabel = `${amountTicket} ticket${
+    amountTicket > 1 ? "s" : ""
+  } 🎟️`;
+  const payload = randomUUID();
+
+  try {
+    const link = await telegraf.telegram.createInvoiceLink({
+      currency: "XTR",
+      prices: [{ label: productLabel, amount: amountTicket * 40 }],
+      title: productLabel,
+      provider_token: "",
+      description: productLabel,
+      payload,
+    });
+
+    return link;
+  } catch (e) {
+    throw e;
+  }
+}

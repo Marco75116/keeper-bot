@@ -159,10 +159,23 @@ export const getBuyMessage = (params: BuyConstructor) => {
   const { network, amount } = params;
 
   const formatValue = (value: string) => value?.trim() || "...";
+  const totalStars = Number(amount) * 40;
 
-  let msg = `➡️ <b>BUY DETAILS</b>\n\n`;
+  if (network === "XTR") {
+    let msg = `⭐️ <b>BUY WITH STARS</b>\n\n`;
+    msg += `1 🎟️ = 40 ⭐️\n\n`;
+    msg += `🎟️ <b>Tickets:</b> ${formatValue(amount)}\n`;
+    msg += `✨ <b>Total:</b> ${totalStars} \n\n`;
+    msg += `Ready to shine? Click confirmation to proceed with your purchase with stars! 🌟`;
+    return msg;
+  }
+
+  let msg = `🪙 <b>BUY WITH CRYPTO</b>\n\n`;
   msg += `🌐 <b>Network:</b> ${formatValue(network)}\n`;
-  msg += `🎟️ <b>Amount:</b> ${formatValue(amount)}\n\n`;
+  msg += `🎟️ <b>Tickets:</b> ${formatValue(amount)}\n`;
+  msg += `💰 <b>Total:</b> ${formatValue(amount)} ${
+    network === "TON" ? "TON" : network === "SOL" ? "SOL" : ""
+  }\n\n`;
   msg += `Please review the purchase details carefully. Once confirmed, the transfer will be initiated. 🔐`;
 
   return msg;

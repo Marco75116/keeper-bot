@@ -72,6 +72,7 @@ export const getBuyKeyboard = () => {
     [
       Markup.button.callback("🌿 TON", BUY_ACTIONS.TON),
       Markup.button.callback("🌉 Solana", BUY_ACTIONS.SOLANA),
+      Markup.button.callback("⭐️ Stars", BUY_ACTIONS.SEND_STARS),
     ],
     [
       Markup.button.callback(
@@ -87,6 +88,16 @@ export const getBuyKeyboard = () => {
     [Markup.button.callback("✅ CONFIRMATION", BUY_ACTIONS.CONFIRMATION)],
     [
       Markup.button.callback("⬅️ Back", KEEPER_HOME_ACTIONS.HOME),
+      Markup.button.callback("✕ Close", KEEPER_HOME_ACTIONS.CLOSE),
+    ],
+  ]);
+};
+
+export const getBuyStarsKeyBoard = (invoiceLink: string, amount: Number) => {
+  return Markup.inlineKeyboard([
+    [Markup.button.url(`Pay ${amount} Stars ⭐️`, invoiceLink)],
+    [
+      Markup.button.callback("⬅️ Back", KEEPER_HOME_ACTIONS.BUY),
       Markup.button.callback("✕ Close", KEEPER_HOME_ACTIONS.CLOSE),
     ],
   ]);

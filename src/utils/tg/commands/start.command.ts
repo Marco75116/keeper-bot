@@ -14,12 +14,14 @@ import {
 import {
   getAttemptKeyBoard,
   getBuyKeyboard,
+  getBuyStarsKeyBoard,
   getChallengeKeyBoard,
   getEmptyKeyBoard,
   getKeeperHomeKeyboard,
   getWelcomeKeyboard,
 } from "../keyboards/global.keyboards";
 import {
+  createInvoiceLink,
   createUser,
   handleAttempt,
   handleBuyCustom,
@@ -44,8 +46,39 @@ import {
   ATTEMPT_PREFIX,
   buyConstructorEmpty,
 } from "../../constants/global.constant";
+import type { BuyConstructor } from "../../types/global.type";
 
 export const botStart = () => {
+  bot.on("pre_checkout_query", async (ctx) => {
+    try {
+      console.log("pre_checkout_query");
+      await ctx.answerPreCheckoutQuery(true);
+    } catch (error) {
+      console.error("Error in pre-checkout:", error);
+      await ctx.answerPreCheckoutQuery(
+        false,
+        "An error occurred. Please try again."
+      );
+    }
+  });
+
+  bot.on("successful_payment", async (ctx) => {
+    try {
+      const payment = ctx.message.successful_payment;
+
+      console.log("Received Stars payment:", {
+        amount: payment.total_amount,
+        currency: payment.currency,
+        from: ctx.from,
+        payload: payment.invoice_payload,
+      });
+
+      await ctx.reply("Thank you for your Stars! ⭐️");
+    } catch (error) {
+      console.error("Error processing Stars payment:", error);
+    }
+  });
+
   bot.on(message("text"), async (ctx) => {
     const userId = ctx.from.id;
     const chatIdKey = getChatId(ctx.chat.id);
@@ -202,7 +235,13 @@ export const botStart = () => {
 
   bot.action(BUY_ACTIONS.SOLANA, async (ctx) => {
     await ctx.answerCbQuery();
-    const buyObject = await handleSetNetworkBuyAction(ctx.from.id, "Solana");
+    const buyObject = await handleSetNetworkBuyAction(ctx.from.id, "SOL");
+    handleMessage(ctx, getBuyMessage(buyObject), getBuyKeyboard());
+  });
+
+  bot.action(BUY_ACTIONS.SEND_STARS, async (ctx) => {
+    await ctx.answerCbQuery();
+    const buyObject = await handleSetNetworkBuyAction(ctx.from.id, "XTR");
     handleMessage(ctx, getBuyMessage(buyObject), getBuyKeyboard());
   });
 
@@ -242,5 +281,33 @@ export const botStart = () => {
 
   bot.action(BUY_ACTIONS.CONFIRMATION, async (ctx) => {
     await ctx.answerCbQuery();
+    const buyObjectString = await redisClient.get(
+      `${buy_PREFIX}:${ctx.from.id}`
+    );
+    if (!buyObjectString) return;
+    const buytokenObject: BuyConstructor = JSON.parse(buyObjectString);
+
+    if (!buytokenObject.network || buytokenObject.network.trim() === "") {
+      return;
+    }
+
+    const parsedAmountTicket = Number(buytokenObject.amount);
+    if (
+      isNaN(parsedAmountTicket) ||
+      parsedAmountTicket <= 0 ||
+      !Number.isInteger(parsedAmountTicket)
+    ) {
+      return;
+    }
+
+    if (buytokenObject.network === "XTR") {
+      const amountStarsPrice = parsedAmountTicket * 40;
+      const link = await createInvoiceLink(ctx, parsedAmountTicket);
+      handleMessage(
+        ctx,
+        getBuyMessage(buytokenObject),
+        getBuyStarsKeyBoard(link, amountStarsPrice)
+      );
+    }
   });
 };

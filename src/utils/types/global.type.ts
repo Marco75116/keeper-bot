@@ -29,7 +29,9 @@ export interface CreateAttemptParams {
   isWin: boolean;
 }
 
+export type NetworkType = "TON" | "SOL" | "XTR" | "";
+
 export interface BuyConstructor {
-  network: string;
+  network: NetworkType;
   amount: string;
 }
