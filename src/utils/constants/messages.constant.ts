@@ -133,7 +133,8 @@ export const formatAttemptConversation = (
 export const getWalletsMessage = (
   tonWallet: string,
   solWallet: string,
-  tonBalance: number
+  tonBalance: number,
+  solanaBalance: number
 ): string => {
   const tonLink = getLink("Ton", `https://tonscan.org/address/${tonWallet}`);
   const solLink = getLink("Solana", `https://solscan.io/account/${solWallet}`);
@@ -152,7 +153,7 @@ export const getWalletsMessage = (
 
 🔑 <b>Address:</b>
 <code>${solWallet}</code>
-• 🌉 ${solLink} : 1.34 SOL  
+• 🌉 ${solLink} : ${solanaBalance.toFixed(2)} SOL  
   
 `;
 

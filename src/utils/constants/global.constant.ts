@@ -19,3 +19,6 @@ export const YUM_GAME = "https://t.me/yumparty_bot/yumbar";
 
 export const TON_ENDPOINT = "https://toncenter.com/api/v2/jsonRPC";
 export const TON_DECIMALS = 9;
+
+export const SOLANA_ENDPOINT = "https://api.mainnet-beta.solana.com";
+export const SOLANA_DECIMALS = 9;

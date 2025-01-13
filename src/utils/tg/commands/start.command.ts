@@ -48,6 +48,7 @@ import {
 } from "../../constants/global.constant";
 import type { BuyConstructor } from "../../types/global.type";
 import { getTONBalance } from "../../helpers/ton.helper";
+import { getSOLBalance } from "../../helpers/solana.helper";
 
 export const botStart = () => {
   bot.on("pre_checkout_query", async (ctx) => {
@@ -200,11 +201,22 @@ export const botStart = () => {
     if (!user) return;
     const tonWallet = "UQC6i1Jh0oy2NMQF_kWTZaT57bxvuqUDZ462GfohVQqFMCSn";
 
-    const tonBalance = await getTONBalance(tonWallet);
+    const solanaWallet = "HzuK5PCN6gi8gaKHZwRMhXS4sJiHyUFM3dtBHXLykVQU";
+
+    const [tonBalance, solanaBalance] = await Promise.all([
+      getTONBalance(tonWallet).catch((error) => {
+        console.error("TON balance fetch error:", error);
+        return 0;
+      }),
+      getSOLBalance(solanaWallet).catch((error) => {
+        console.error("Solana balance fetch error:", error);
+        return 0;
+      }),
+    ]);
 
     await handleMessage(
       ctx,
-      getWalletsMessage(tonWallet, user.wallet, tonBalance),
+      getWalletsMessage(tonWallet, solanaWallet, tonBalance, solanaBalance),
       getKeeperHomeKeyboard()
     );
   });
