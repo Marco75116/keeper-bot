@@ -11,6 +11,7 @@ import {
   decrementTickets,
   incrementPoolPrize,
   insertAttempt,
+  insertTONWallet,
   insertUser,
   insertWallet,
   updatePoolPrizeWinner,
@@ -33,6 +34,7 @@ import {
 } from "../tg/keyboards/global.keyboards";
 import { buyConstructorEmpty, URL_KEEPER } from "../constants/global.constant";
 import { buy_PREFIX } from "../tg/actions/global.actions";
+import { createTONWalletV5 } from "./ton.helper";
 
 const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY;
 
@@ -47,34 +49,48 @@ export const encrypt = (privateKey: string): EncryptedData => {
     Buffer.from(ENCRYPTION_KEY, "hex"),
     iv
   );
-  let encrypted = cipher.update(privateKey);
-  encrypted = Buffer.concat([encrypted, cipher.final()]);
-  return { iv: iv.toString("hex"), encryptedData: encrypted.toString("hex") };
+  let encrypted = cipher.update(privateKey, "utf8", "hex");
+  encrypted += cipher.final("hex");
+  return { iv: iv.toString("hex"), encryptedData: encrypted };
 };
 
 export const decrypt = (encryptedObject: EncryptedData): string => {
   const iv = Buffer.from(encryptedObject.iv, "hex");
-  const encryptedText = Buffer.from(encryptedObject.encryptedData, "hex");
+
   const decipher = crypto.createDecipheriv(
     "aes-256-cbc",
     Buffer.from(ENCRYPTION_KEY, "hex"),
     iv
   );
-  let decrypted = decipher.update(encryptedText);
-  decrypted = Buffer.concat([decrypted, decipher.final()]);
-  return decrypted.toString();
+  let decrypted = decipher.update(encryptedObject.encryptedData, "hex", "utf8");
+  decrypted += decipher.final("utf8");
+  return decrypted;
 };
 
-export const createUser = (tgUser: User) => {
+export const createUser = async (tgUser: User) => {
   const walletDetails = createWallet();
   const encryptedData = encrypt(walletDetails.privateKey);
-  insertUser({
-    idtg: tgUser.id,
-    firstname: tgUser.first_name,
-    tgusername: tgUser.username,
-    wallet: walletDetails.walletAddress,
-    tickets: 5,
-  });
+
+  const tonWallet = await createTONWalletV5();
+  if (tonWallet) {
+    const secretKeyString = tonWallet.secretKey.toString("hex");
+    const encryptedTONData = encrypt(secretKeyString);
+    const newUser = await insertUser({
+      idtg: tgUser.id,
+      firstname: tgUser.first_name,
+      tgusername: tgUser.username,
+      wallet: walletDetails.walletAddress,
+      tickets: 5,
+    });
+    await insertTONWallet({
+      publicKey: tonWallet.publicKey.toString("hex"),
+      userId: newUser[0].id,
+      encryptedPrivateKeyData: encryptedTONData.encryptedData,
+      encryptedPrivateKeyIv: encryptedTONData.iv,
+      address: tonWallet.address,
+    });
+  }
+
   insertWallet({
     idtg: tgUser.id,
     wallet: walletDetails.walletAddress,

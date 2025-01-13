@@ -24,8 +24,9 @@ export const createTONWalletV5 = async () => {
       workchain: 0,
     });
     const contract = tonClient.open(wallet);
+    const address = wallet.address.toString();
 
-    return { wallet, contract, secretKey };
+    return { wallet, contract, publicKey, secretKey, address };
   } catch (error) {
     console.error("Error creating Wallet:", error);
   }

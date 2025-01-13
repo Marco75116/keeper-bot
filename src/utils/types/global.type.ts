@@ -35,3 +35,12 @@ export interface BuyConstructor {
   network: NetworkType;
   amount: string;
 }
+
+export type TONWalletParams = {
+  publicKey: string;
+  userId: number;
+  encryptedPrivateKeyData: string;
+  encryptedPrivateKeyIv: string;
+  address: string;
+  deployed?: boolean;
+};
