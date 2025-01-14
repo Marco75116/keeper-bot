@@ -32,6 +32,7 @@ import {
 import {
   getAttemptsByIdTg,
   getPrizePool,
+  getTonWalletAddress,
   getUser,
 } from "../../helpers/bddqueries/get.queries.helper";
 import {
@@ -199,7 +200,7 @@ export const botStart = () => {
     const user = await getUser(ctx.from.id);
 
     if (!user) return;
-    const tonWallet = "UQC6i1Jh0oy2NMQF_kWTZaT57bxvuqUDZ462GfohVQqFMCSn";
+    const tonWallet = await getTonWalletAddress(ctx.from.id);
 
     const solanaWallet = "HzuK5PCN6gi8gaKHZwRMhXS4sJiHyUFM3dtBHXLykVQU";
 

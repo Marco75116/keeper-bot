@@ -1,7 +1,12 @@
 import { desc, eq, isNull } from "drizzle-orm";
 import { redisClient } from "../../clients/redis.client";
 import { db } from "../../clients/drizzle.client";
-import { attempts, poolPrize, users } from "../../../db/schema";
+import {
+  attempts,
+  cashierWalletTon,
+  poolPrize,
+  users,
+} from "../../../db/schema";
 import type { User } from "../../types/global.type";
 import { POOL_CACHED_KEY } from "../../constants/global.constant";
 
@@ -131,5 +136,20 @@ export const getPrizePool = async () => {
       success: false,
       error: error,
     };
+  }
+};
+
+export const getTonWalletAddress = async (userId: number) => {
+  try {
+    const wallet = await db
+      .select()
+      .from(cashierWalletTon)
+      .where(eq(cashierWalletTon.userId, userId))
+      .limit(1);
+
+    return wallet[0]?.address;
+  } catch (error) {
+    console.error("Error fetching TON wallet address:", error);
+    throw error;
   }
 };

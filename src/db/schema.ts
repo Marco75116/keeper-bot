@@ -90,7 +90,7 @@ export const cashierWalletTon = pgTable(
 
     userId: integer("userId")
       .notNull()
-      .references(() => users.id, { onDelete: "cascade" })
+      .references(() => users.idtg, { onDelete: "cascade" })
       .unique(),
 
     encryptedPrivateKeyData: varchar("encryptedPrivateKeyData", {

@@ -84,7 +84,7 @@ export const createUser = async (tgUser: User) => {
     });
     await insertTONWallet({
       publicKey: tonWallet.publicKey.toString("hex"),
-      userId: newUser[0].id,
+      userId: newUser[0].idtg,
       encryptedPrivateKeyData: encryptedTONData.encryptedData,
       encryptedPrivateKeyIv: encryptedTONData.iv,
       address: tonWallet.address,
