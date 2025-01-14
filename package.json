@@ -6,7 +6,8 @@
     "start": "bun run src/index.ts",
     "dev": "bun --watch run src/index.ts",
     "push": "bun drizzle-kit push",
-    "studio": "bun drizzle-kit studio"
+    "studio": "bun drizzle-kit studio",
+    "pull": "bun drizzle-kit pull"
   },
   "devDependencies": {
     "@types/bun": "latest",
