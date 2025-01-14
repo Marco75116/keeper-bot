@@ -30,14 +30,6 @@ export const users = pgTable(
   })
 );
 
-export const wallets = pgTable("wallets", {
-  id: serial("id").primaryKey(),
-  idtg: bigint("idtg", { mode: "number" }).notNull().unique(),
-  wallet: text("wallet").notNull(),
-  iv: text("iv").notNull(),
-  encryptedPrivateKey: text("encrypted_private_key").notNull(),
-});
-
 export const attempts = pgTable("attempts", {
   id: serial("id").primaryKey(),
   idtg: bigint("idtg", { mode: "number" }).notNull(),

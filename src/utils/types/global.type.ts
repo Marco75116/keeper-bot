@@ -14,14 +14,6 @@ export interface EncryptedData {
   encryptedData: string;
 }
 
-export interface CreateUserParams {
-  idtg: number;
-  firstname: string;
-  tgusername?: string;
-  wallet: string;
-  tickets: number;
-}
-
 export interface CreateAttemptParams {
   idtg: number;
   userPrompt: string;
