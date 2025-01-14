@@ -2,15 +2,23 @@ import { sql } from "drizzle-orm";
 import {
   pgTable,
   serial,
-  text,
-  timestamp,
-  integer,
-  boolean,
-  check,
-  bigint,
-  numeric,
-  index,
   varchar,
+  integer,
+  timestamp,
+  index,
+  foreignKey,
+  unique,
+  uuid,
+  text,
+  boolean,
+  doublePrecision,
+  numeric,
+  bigint,
+  check,
+  real,
+  jsonb,
+  primaryKey,
+  pgMaterializedView,
 } from "drizzle-orm/pg-core";
 
 export const users = pgTable(
@@ -48,58 +56,98 @@ export const poolPrize = pgTable("pool_prize", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-export const cashierWalletSol = pgTable(
-  "cashier_wallet_sol",
+export const user = pgTable(
+  "user",
   {
-    publicKey: text("publicKey").notNull().primaryKey(),
-
-    userId: integer("userId")
-      .notNull()
-      .references(() => users.id, { onDelete: "cascade" })
-      .unique(),
-
-    encryptedPrivateKeyData: varchar("encryptedPrivateKeyData", {
-      length: 500,
-    }).notNull(),
-
-    encryptedPrivateKeyIv: text("encryptedPrivateKeyIv").notNull(),
-
-    deployed: boolean("deployed").default(false),
-
-    createdAt: timestamp("created_at").notNull().defaultNow(),
-
-    updatedAt: timestamp("updated_at").notNull().defaultNow(),
+    id: uuid()
+      .default(sql`uuid_generate_v4()`)
+      .primaryKey()
+      .notNull(),
+    // You can use { mode: "bigint" } if numbers are exceeding js number limitations
+    telegramId: bigint("telegram_id", { mode: "number" }).notNull(),
+    username: varchar({ length: 50 }).default("player").notNull(),
+    firstName: varchar("first_name", { length: 50 }).notNull(),
+    lastName: varchar("last_name", { length: 50 }).notNull(),
+    languageCode: varchar("language_code", { length: 255 }).notNull(),
+    teamId: integer("team_id"),
+    // You can use { mode: "bigint" } if numbers are exceeding js number limitations
+    coinBalance: bigint("coin_balance", { mode: "number" })
+      .default(sql`'0'`)
+      .notNull(),
+    yumBucks: integer("yum_bucks").default(0).notNull(),
+    elo: integer().default(0).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+    yumbarTickets: integer("yumbar_tickets").default(0).notNull(),
+    lastYumbarEarnAt: timestamp("last_yumbar_earn_at", {
+      mode: "string",
+    }).default(sql`CURRENT_TIMESTAMP`),
+    referralId: varchar("referral_id", { length: 10 }).notNull(),
+    eloMax: integer("elo_max").default(0).notNull(),
+    leagueIdMax: integer("league_id_max"),
+    telegramPremium: boolean("telegram_premium").default(false).notNull(),
   },
-  (table) => ({
-    userIdIdx: index("sol_userId_idx").on(table.userId),
-  })
+  (table) => [
+    index("idx_user_elo").using(
+      "btree",
+      table.elo.desc().nullsFirst().op("int4_ops")
+    ),
+    index("idx_user_ranking_elo").using(
+      "btree",
+      table.elo.desc().nullsFirst().op("int4_ops")
+    ),
+    index().using("btree", table.elo.asc().nullsLast().op("int4_ops")),
+    index("user_referralid_index").using(
+      "btree",
+      table.referralId.asc().nullsLast().op("text_ops")
+    ),
+    index("user_telegramid_index").using(
+      "btree",
+      table.telegramId.asc().nullsLast().op("int8_ops")
+    ),
+    unique("user_telegramid_unique").on(table.telegramId),
+    unique("user_referralid_unique").on(table.referralId),
+  ]
 );
 
 export const cashierWalletTon = pgTable(
   "cashier_wallet_ton",
   {
-    publicKey: text("publicKey").notNull().primaryKey(),
-
-    userId: integer("userId")
-      .notNull()
-      .references(() => users.idtg, { onDelete: "cascade" })
-      .unique(),
-
-    encryptedPrivateKeyData: varchar("encryptedPrivateKeyData", {
+    publicKey: varchar("public_key", { length: 255 }).primaryKey().notNull(),
+    userId: uuid("user_id").notNull(),
+    encryptedPrivateKeyData: varchar("encrypted_private_key_data", {
       length: 500,
     }).notNull(),
-
-    encryptedPrivateKeyIv: text("encryptedPrivateKeyIv").notNull(),
-
-    address: text("address").notNull(),
-
-    deployed: boolean("deployed").default(false),
-
-    createdAt: timestamp("created_at").notNull().defaultNow(),
-
-    updatedAt: timestamp("updated_at").notNull().defaultNow(),
+    encryptedPrivateKeyIv: varchar("encrypted_private_key_iv", {
+      length: 255,
+    }).notNull(),
+    address: varchar({ length: 255 }).notNull(),
+    deployed: boolean().default(false),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
   },
-  (table) => ({
-    userIdIdx: index("ton_userId_idx").on(table.userId),
-  })
+  (table) => [
+    index("cashier_wallet_ton_userid_index").using(
+      "btree",
+      table.userId.asc().nullsLast().op("uuid_ops")
+    ),
+    foreignKey({
+      columns: [table.userId],
+      foreignColumns: [user.id],
+      name: "cashier_wallet_ton_user_id_foreign",
+    }).onDelete("cascade"),
+    unique("cashier_wallet_ton_publickey_userid_unique").on(
+      table.publicKey,
+      table.userId
+    ),
+    unique("cashier_wallet_ton_userid_unique").on(table.userId),
+  ]
 );

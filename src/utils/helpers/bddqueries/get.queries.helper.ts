@@ -5,6 +5,7 @@ import {
   attempts,
   cashierWalletTon,
   poolPrize,
+  user,
   users,
 } from "../../../db/schema";
 import type { User } from "../../types/global.type";
@@ -139,15 +140,18 @@ export const getPrizePool = async () => {
   }
 };
 
-export const getTonWalletAddress = async (userId: number) => {
+export const getTonWalletAddress = async (telegramId: number) => {
   try {
-    const wallet = await db
-      .select()
+    const result = await db
+      .select({
+        address: cashierWalletTon.address,
+      })
       .from(cashierWalletTon)
-      .where(eq(cashierWalletTon.userId, userId))
+      .innerJoin(user, eq(cashierWalletTon.userId, user.id))
+      .where(eq(user.telegramId, telegramId))
       .limit(1);
 
-    return wallet[0]?.address;
+    return result[0]?.address;
   } catch (error) {
     console.error("Error fetching TON wallet address:", error);
     throw error;

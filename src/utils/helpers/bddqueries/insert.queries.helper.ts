@@ -1,15 +1,7 @@
 import { eq, isNull, sql } from "drizzle-orm";
-import {
-  attempts,
-  cashierWalletTon,
-  poolPrize,
-  users,
-} from "../../../db/schema";
+import { attempts, poolPrize, users } from "../../../db/schema";
 import { db } from "../../clients/drizzle.client";
-import type {
-  CreateAttemptParams,
-  TONWalletParams,
-} from "../../types/global.type";
+import type { CreateAttemptParams } from "../../types/global.type";
 
 export const insertAttempt = async (params: CreateAttemptParams) => {
   return await db
@@ -119,16 +111,5 @@ export const updatePoolPrizeWinner = async (idtgWinner: number) => {
       success: false,
       error: error,
     };
-  }
-};
-
-export const insertTONWallet = async (params: TONWalletParams) => {
-  try {
-    await db.insert(cashierWalletTon).values({
-      ...params,
-    });
-  } catch (error) {
-    console.error("Error inserting TON wallet:", error);
-    throw error;
   }
 };
