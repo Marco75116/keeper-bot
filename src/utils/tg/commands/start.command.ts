@@ -152,8 +152,8 @@ export const botStart = () => {
 
     await handleMessage(
       ctx,
-      getChallengeMessage(user.tickets),
-      getChallengeKeyBoard(user.tickets)
+      getChallengeMessage(user.yumbarTickets),
+      getChallengeKeyBoard(user.yumbarTickets)
     );
   });
 

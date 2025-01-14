@@ -1,4 +1,4 @@
-import { desc, eq, isNull } from "drizzle-orm";
+import { desc, eq, isNull, sql } from "drizzle-orm";
 import { redisClient } from "../../clients/redis.client";
 import { db } from "../../clients/drizzle.client";
 import {
@@ -22,13 +22,23 @@ export const setCachedUser = async (
     .where(eq(user.telegramId, telegramId))
     .limit(1);
 
-  const userData = userResults[0] || null;
+  if (!userResults[0]) return null;
 
-  if (userData) {
-    await redisClient.set(`user:${telegramId}`, JSON.stringify(userData), {
-      EX: 300,
-    });
-  }
+  const attemptsCount = await db
+    .select({
+      count: sql<number>`cast(count(*) as integer)`,
+    })
+    .from(attempts)
+    .where(eq(attempts.idtg, telegramId));
+
+  const userData = {
+    ...userResults[0],
+    attempts: attemptsCount[0].count,
+  };
+
+  await redisClient.set(`user:${telegramId}`, JSON.stringify(userData), {
+    EX: 300,
+  });
 
   return userData;
 };
@@ -62,6 +72,7 @@ export const getUser = async (idtg: number): Promise<CachedUser | null> => {
       return {
         telegramId: Number(parsed.telegramId),
         yumbarTickets: Number(parsed.yumbarTickets),
+        attempts: Number(parsed.attempts),
       };
     }
 

@@ -30,4 +30,5 @@ export interface BuyConstructor {
 export interface CachedUser {
   telegramId: number;
   yumbarTickets: number;
+  attempts: number;
 }
