@@ -7,7 +7,8 @@
     "dev": "bun --watch run src/index.ts",
     "push": "bun drizzle-kit push",
     "studio": "bun drizzle-kit studio",
-    "pull": "bun drizzle-kit pull"
+    "pull": "bun drizzle-kit pull",
+    "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "@types/bun": "latest",
