@@ -3,6 +3,7 @@ import { redisClient } from "../../clients/redis.client";
 import { db } from "../../clients/drizzle.client";
 import {
   attempts,
+  cashierWalletSol,
   cashierWalletTon,
   poolPrize,
   user,
@@ -173,6 +174,24 @@ export const getTonWalletAddress = async (telegramId: number) => {
     return result[0]?.address;
   } catch (error) {
     console.error("Error fetching TON wallet address:", error);
+    throw error;
+  }
+};
+
+export const getSolWalletPublicKey = async (telegramId: number) => {
+  try {
+    const result = await db
+      .select({
+        publicKey: cashierWalletSol.publicKey,
+      })
+      .from(cashierWalletSol)
+      .innerJoin(user, eq(cashierWalletSol.userId, user.id))
+      .where(eq(user.telegramId, telegramId))
+      .limit(1);
+
+    return result[0]?.publicKey;
+  } catch (error) {
+    console.error("Error fetching SOL wallet public key:", error);
     throw error;
   }
 };

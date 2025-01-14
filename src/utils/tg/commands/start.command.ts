@@ -31,6 +31,7 @@ import {
 import {
   getAttemptsByIdTg,
   getPrizePool,
+  getSolWalletPublicKey,
   getTonWalletAddress,
   getUser,
 } from "../../helpers/bddqueries/get.queries.helper";
@@ -191,12 +192,12 @@ export const botStart = () => {
 
   bot.action(KEEPER_HOME_ACTIONS.WALLET, async (ctx) => {
     await ctx.answerCbQuery();
-    const user = await getUser(ctx.from.id);
+    const userId = ctx.from.id;
 
-    if (!user) return;
-    const tonWallet = await getTonWalletAddress(ctx.from.id);
-
-    const solanaWallet = "HzuK5PCN6gi8gaKHZwRMhXS4sJiHyUFM3dtBHXLykVQU";
+    const [tonWallet, solanaWallet] = await Promise.all([
+      getTonWalletAddress(userId),
+      getSolWalletPublicKey(userId),
+    ]);
 
     const [tonBalance, solanaBalance] = await Promise.all([
       getTONBalance(tonWallet).catch((error) => {
