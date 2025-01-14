@@ -28,7 +28,11 @@ import {
   getBuyKeyboard,
   getEmptyKeyBoard,
 } from "../tg/keyboards/global.keyboards";
-import { buyConstructorEmpty, URL_KEEPER } from "../constants/global.constant";
+import {
+  buyConstructorEmpty,
+  TICKET_PRICE_IN_STARS,
+  URL_KEEPER,
+} from "../constants/global.constant";
 import { buy_PREFIX } from "../tg/actions/global.actions";
 
 const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY;
@@ -330,7 +334,9 @@ export async function createInvoiceLink(
   try {
     const link = await telegraf.telegram.createInvoiceLink({
       currency: "XTR",
-      prices: [{ label: productLabel, amount: amountTicket * 40 }],
+      prices: [
+        { label: productLabel, amount: amountTicket * TICKET_PRICE_IN_STARS },
+      ],
       title: productLabel,
       provider_token: "",
       description: productLabel,

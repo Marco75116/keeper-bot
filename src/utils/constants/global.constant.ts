@@ -22,3 +22,5 @@ export const TON_DECIMALS = 9;
 
 export const SOLANA_ENDPOINT = "https://api.mainnet-beta.solana.com";
 export const SOLANA_DECIMALS = 9;
+
+export const TICKET_PRICE_IN_STARS = 40;

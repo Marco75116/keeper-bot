@@ -106,3 +106,12 @@ export const getBuyStarsKeyBoard = (invoiceLink: string, amount: Number) => {
     ],
   ]);
 };
+
+export const getPaymentSuccessKeyBoard = () => {
+  return Markup.inlineKeyboard([
+    [
+      Markup.button.callback("⬅️ Back", KEEPER_HOME_ACTIONS.HOME),
+      Markup.button.callback("✕ Close", KEEPER_HOME_ACTIONS.CLOSE),
+    ],
+  ]);
+};

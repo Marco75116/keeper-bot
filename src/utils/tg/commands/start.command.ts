@@ -4,6 +4,7 @@ import {
   formatPromptHistory,
   getBuyMessage,
   getChallengeMessage,
+  getPaymentSuccessMessage,
   getPoolPrizeMessage,
   getRandomRiddle,
   getWalletsMessage,
@@ -18,6 +19,7 @@ import {
   getChallengeKeyBoard,
   getEmptyKeyBoard,
   getKeeperHomeKeyboard,
+  getPaymentSuccessKeyBoard,
   getWelcomeKeyboard,
 } from "../keyboards/global.keyboards";
 import {
@@ -34,6 +36,7 @@ import {
   getSolWalletPublicKey,
   getTonWalletAddress,
   getUser,
+  setCachedUser,
 } from "../../helpers/bddqueries/get.queries.helper";
 import {
   BUY_ACTIONS,
@@ -46,10 +49,12 @@ import { getChatId } from "../../helpers/global.helper";
 import {
   ATTEMPT_PREFIX,
   buyConstructorEmpty,
+  TICKET_PRICE_IN_STARS,
 } from "../../constants/global.constant";
 import type { BuyConstructor } from "../../types/global.type";
 import { getTONBalance } from "../../helpers/ton.helper";
 import { getSOLBalance } from "../../helpers/solana.helper";
+import { incrementTickets } from "../../helpers/bddqueries/insert.queries.helper";
 
 export const botStart = () => {
   bot.on("pre_checkout_query", async (ctx) => {
@@ -67,16 +72,31 @@ export const botStart = () => {
 
   bot.on("successful_payment", async (ctx) => {
     try {
+      const userId = ctx.from.id;
       const payment = ctx.message.successful_payment;
 
-      console.log("Received Stars payment:", {
-        amount: payment.total_amount,
-        currency: payment.currency,
-        from: ctx.from,
-        payload: payment.invoice_payload,
-      });
+      const numberTicketsBought = payment.total_amount / TICKET_PRICE_IN_STARS;
 
-      await ctx.reply("Thank you for your Stars! ⭐️");
+      const ticketsResponce = await incrementTickets(
+        userId,
+        numberTicketsBought
+      );
+
+      if (!ticketsResponce.success || ticketsResponce.tickets === undefined) {
+        console.error("Failed to increment tickets");
+        return;
+      }
+
+      await setCachedUser(userId);
+      const chatIdKey = getChatId(ctx.chat.id);
+      const messageId = await redisClient.get(chatIdKey);
+
+      await handleMessage(
+        ctx,
+        getPaymentSuccessMessage(ticketsResponce.tickets),
+        getPaymentSuccessKeyBoard(),
+        Number(messageId)
+      );
     } catch (error) {
       console.error("Error processing Stars payment:", error);
     }
@@ -317,7 +337,7 @@ export const botStart = () => {
     }
 
     if (buytokenObject.network === "XTR") {
-      const amountStarsPrice = parsedAmountTicket * 40;
+      const amountStarsPrice = parsedAmountTicket * TICKET_PRICE_IN_STARS;
       const link = await createInvoiceLink(ctx, parsedAmountTicket);
       handleMessage(
         ctx,

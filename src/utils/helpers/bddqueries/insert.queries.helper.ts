@@ -110,3 +110,31 @@ export const updatePoolPrizeWinner = async (idtgWinner: number) => {
     };
   }
 };
+
+export const incrementTickets = async (
+  telegramId: number,
+  numberTicketsBought: number
+) => {
+  try {
+    const result = await db
+      .update(user)
+      .set({
+        yumbarTickets: sql`${user.yumbarTickets} + ${numberTicketsBought}`,
+      })
+      .where(eq(user.telegramId, telegramId))
+      .returning({
+        tickets: user.yumbarTickets,
+      });
+
+    return {
+      success: true,
+      tickets: result[0].tickets,
+    };
+  } catch (error) {
+    console.error("Error incrementing tickets:", error);
+    return {
+      success: false,
+      error: error,
+    };
+  }
+};

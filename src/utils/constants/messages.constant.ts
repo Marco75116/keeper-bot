@@ -1,5 +1,6 @@
 import { getLink } from "../helpers/global.helper";
 import type { Attempts, BuyConstructor, PoolPrize } from "../types/global.type";
+import { TICKET_PRICE_IN_STARS } from "./global.constant";
 
 export const WELCOME_MESSAGE = `Welcome to Yum Party! 🍭
 The taps are over—now it's all about skills! 💥
@@ -164,11 +165,11 @@ export const getBuyMessage = (params: BuyConstructor) => {
   const { network, amount } = params;
 
   const formatValue = (value: string) => value?.trim() || "...";
-  const totalStars = Number(amount) * 40;
+  const totalStars = Number(amount) * TICKET_PRICE_IN_STARS;
 
   if (network === "XTR") {
     let msg = `⭐️ <b>BUY WITH STARS</b>\n\n`;
-    msg += `1 🎟️ = 40 ⭐️\n\n`;
+    msg += `1 🎟️ = ${TICKET_PRICE_IN_STARS} ⭐️\n\n`;
     msg += `🎟️ <b>Tickets:</b> ${formatValue(amount)}\n`;
     msg += `✨ <b>Total:</b> ${totalStars} \n\n`;
     msg += `Ready to shine? Click confirmation to proceed with your purchase with stars! 🌟`;
@@ -184,4 +185,14 @@ export const getBuyMessage = (params: BuyConstructor) => {
   msg += `Please review the purchase details carefully. Once confirmed, the transfer will be initiated. 🔐`;
 
   return msg;
+};
+
+export const getPaymentSuccessMessage = (tickets: number) => {
+  return `✨ <b>Payment Successful!</b>
+
+Thank you for your Stars! ⭐️
+
+Your current ticket balance: ${tickets} 🎟
+
+Good luck breaking the vault! 🔒`;
 };
