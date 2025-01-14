@@ -14,23 +14,24 @@ import { POOL_CACHED_KEY } from "../../constants/global.constant";
 export const setCachedUser = async (
   telegramId: number
 ): Promise<CachedUser | null> => {
-  const userResults = await db
-    .select({
-      telegramId: user.telegramId,
-      yumbarTickets: user.yumbarTickets,
-    })
-    .from(user)
-    .where(eq(user.telegramId, telegramId))
-    .limit(1);
+  const [userResults, attemptsCount] = await Promise.all([
+    db
+      .select({
+        telegramId: user.telegramId,
+        yumbarTickets: user.yumbarTickets,
+      })
+      .from(user)
+      .where(eq(user.telegramId, telegramId))
+      .limit(1),
+    db
+      .select({
+        count: sql<number>`cast(count(*) as integer)`,
+      })
+      .from(attempts)
+      .where(eq(attempts.idtg, telegramId)),
+  ]);
 
   if (!userResults[0]) return null;
-
-  const attemptsCount = await db
-    .select({
-      count: sql<number>`cast(count(*) as integer)`,
-    })
-    .from(attempts)
-    .where(eq(attempts.idtg, telegramId));
 
   const userData = {
     ...userResults[0],
@@ -43,7 +44,6 @@ export const setCachedUser = async (
 
   return userData;
 };
-
 export const updateCachedUser = async (
   idtg: number,
   updates: { tickets?: number; attempts?: number }
