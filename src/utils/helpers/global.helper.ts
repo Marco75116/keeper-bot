@@ -16,8 +16,8 @@ import { Context, Markup } from "telegraf";
 import { bot } from "../clients/telegraf.client";
 import { redisClient } from "../clients/redis.client";
 import {
+  setCachedUser,
   updateCachedPrizePool,
-  updateCachedUser,
 } from "./bddqueries/get.queries.helper";
 import {
   formatAttemptConversation,
@@ -123,6 +123,37 @@ export const handleBuyCustom = async (ctx: any) => {
     Number(messageId)
   );
 };
+const startLoading = async (chatId: number, messageId: string) => {
+  let isProcessing = true;
+  const loadingStates = [
+    "🤖 Keeper is thinking...",
+    "⚡ Analyzing your answer...",
+  ];
+
+  const loadingLoop = async () => {
+    let i = 0;
+    while (isProcessing) {
+      const options: any = {
+        parse_mode: "HTML",
+        ...getEmptyKeyBoard(),
+      };
+
+      await bot.telegram.editMessageText(
+        chatId,
+        Number(messageId),
+        undefined,
+        loadingStates[i % loadingStates.length],
+        options
+      );
+
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      i++;
+    }
+  };
+
+  const loadingPromise = loadingLoop();
+  return { loadingPromise, stopLoading: () => (isProcessing = false) };
+};
 
 export const handleAttempt = async (ctx: any) => {
   const chatId = ctx.chat.id;
@@ -131,40 +162,12 @@ export const handleAttempt = async (ctx: any) => {
   const chatIdKey = getChatId(ctx.chat.id);
   const messageId = await redisClient.get(chatIdKey);
 
-  if (messageId) {
-    let isProcessing = true;
-    const loadingStates = [
-      "🤖 Keeper is thinking...",
-      "⚡ Analyzing your answer...",
-    ];
+  if (!messageId) return;
 
-    const loadingLoop = async () => {
-      let i = 0;
-      while (isProcessing) {
-        const options: any = {
-          parse_mode: "HTML",
-          ...getEmptyKeyBoard(),
-        };
+  const { loadingPromise, stopLoading } = await startLoading(chatId, messageId);
 
-        await bot.telegram.editMessageText(
-          chatId,
-          Number(messageId),
-          undefined,
-          loadingStates[i % loadingStates.length],
-          options
-        );
-
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        i++;
-      }
-    };
-
-    const loadingPromise = loadingLoop();
-
+  try {
     const { data, success, error } = await sendChatMessage(ctx.message.text);
-
-    isProcessing = false;
-    await loadingPromise;
 
     if (!success || !data) {
       console.error("Chat API error:", error);
@@ -174,12 +177,14 @@ export const handleAttempt = async (ctx: any) => {
     const passed = await decrementTickets(userId);
     if (!passed.success) return;
 
-    if (passed.tickets !== undefined && passed.attempts !== undefined) {
-      await updateCachedUser(userId, {
-        tickets: passed.tickets,
-        attempts: passed.attempts,
-      });
-    }
+    await insertAttempt({
+      idtg: userId,
+      userPrompt: ctx.message.text,
+      keeperMessage: data.response,
+      isWin: data.is_secret_discovered,
+    });
+
+    const userUpdated = await setCachedUser(userId);
 
     const incrementResult = await incrementPoolPrize();
 
@@ -203,16 +208,12 @@ export const handleAttempt = async (ctx: any) => {
       ctx.message.text,
       data.response,
       amountPrizePoolWin,
-      passed.attempts,
+      userUpdated?.attempts,
       data.is_secret_discovered
     );
 
-    await insertAttempt({
-      idtg: userId,
-      userPrompt: ctx.message.text,
-      keeperMessage: data.response,
-      isWin: data.is_secret_discovered,
-    });
+    stopLoading();
+    await loadingPromise;
 
     const options: any = {
       parse_mode: "HTML",
@@ -229,6 +230,10 @@ export const handleAttempt = async (ctx: any) => {
       postAttempScreen,
       options
     );
+  } catch (error) {
+    stopLoading();
+    await loadingPromise;
+    throw error;
   }
 };
 export interface ChatResponse {
