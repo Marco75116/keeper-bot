@@ -1,5 +1,5 @@
 import { eq, isNull, sql } from "drizzle-orm";
-import { attempts, poolPrize, users } from "../../../db/schema";
+import { attempts, poolPrize, user } from "../../../db/schema";
 import { db } from "../../clients/drizzle.client";
 import type { CreateAttemptParams } from "../../types/global.type";
 
@@ -15,24 +15,21 @@ export const insertAttempt = async (params: CreateAttemptParams) => {
     .returning();
 };
 
-export const decrementTickets = async (idtg: number) => {
+export const decrementTickets = async (telegramId: number) => {
   try {
     const result = await db
-      .update(users)
+      .update(user)
       .set({
-        tickets: sql`${users.tickets} - 1`,
-        attempts: sql`${users.attempts} + 1`,
+        yumbarTickets: sql`${user.yumbarTickets} - 1`,
       })
-      .where(eq(users.idtg, idtg))
+      .where(eq(user.telegramId, telegramId))
       .returning({
-        tickets: users.tickets,
-        attempts: users.attempts,
+        tickets: user.yumbarTickets,
       });
 
     return {
       success: true,
       tickets: result[0].tickets,
-      attempts: result[0].attempts,
     };
   } catch (error) {
     return {
