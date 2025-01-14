@@ -6,27 +6,31 @@ import {
   cashierWalletTon,
   poolPrize,
   user,
-  users,
 } from "../../../db/schema";
-import type { User } from "../../types/global.type";
+import type { CachedUser } from "../../types/global.type";
 import { POOL_CACHED_KEY } from "../../constants/global.constant";
 
-export const setCachedUser = async (idtg: number): Promise<User | null> => {
+export const setCachedUser = async (
+  telegramId: number
+): Promise<CachedUser | null> => {
   const userResults = await db
-    .select()
-    .from(users)
-    .where(eq(users.idtg, idtg))
+    .select({
+      telegramId: user.telegramId,
+      yumbarTickets: user.yumbarTickets,
+    })
+    .from(user)
+    .where(eq(user.telegramId, telegramId))
     .limit(1);
 
-  const user = userResults[0] || null;
+  const userData = userResults[0] || null;
 
-  if (user) {
-    await redisClient.set(`user:${idtg}`, JSON.stringify(user), {
+  if (userData) {
+    await redisClient.set(`user:${telegramId}`, JSON.stringify(userData), {
       EX: 300,
     });
   }
 
-  return user;
+  return userData;
 };
 
 export const updateCachedUser = async (
@@ -50,11 +54,15 @@ export const updateCachedUser = async (
   }
 };
 
-export const getUser = async (idtg: number): Promise<User | null> => {
+export const getUser = async (idtg: number): Promise<CachedUser | null> => {
   try {
     const cachedUser = await redisClient.get(`user:${idtg}`);
     if (cachedUser) {
-      return JSON.parse(cachedUser);
+      const parsed = JSON.parse(cachedUser);
+      return {
+        telegramId: Number(parsed.telegramId),
+        yumbarTickets: Number(parsed.yumbarTickets),
+      };
     }
 
     return await setCachedUser(idtg);
