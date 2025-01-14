@@ -4,16 +4,12 @@ import type {
   EncryptedData,
   NetworkType,
 } from "../types/global.type";
-import { createWallet, faucet } from "./viem.helper";
 import crypto, { randomUUID } from "crypto";
 import {
   createPrizePool,
   decrementTickets,
   incrementPoolPrize,
   insertAttempt,
-  insertTONWallet,
-  insertUser,
-  insertWallet,
   updatePoolPrizeWinner,
 } from "./bddqueries/insert.queries.helper";
 import { Context, Markup } from "telegraf";
@@ -34,7 +30,6 @@ import {
 } from "../tg/keyboards/global.keyboards";
 import { buyConstructorEmpty, URL_KEEPER } from "../constants/global.constant";
 import { buy_PREFIX } from "../tg/actions/global.actions";
-import { createTONWalletV5 } from "./ton.helper";
 
 const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY;
 
@@ -65,39 +60,6 @@ export const decrypt = (encryptedObject: EncryptedData): string => {
   let decrypted = decipher.update(encryptedObject.encryptedData, "hex", "utf8");
   decrypted += decipher.final("utf8");
   return decrypted;
-};
-
-export const createUser = async (tgUser: User) => {
-  const walletDetails = createWallet();
-  const encryptedData = encrypt(walletDetails.privateKey);
-
-  const tonWallet = await createTONWalletV5();
-  if (tonWallet) {
-    const secretKeyString = tonWallet.secretKey.toString("hex");
-    const encryptedTONData = encrypt(secretKeyString);
-    const newUser = await insertUser({
-      idtg: tgUser.id,
-      firstname: tgUser.first_name,
-      tgusername: tgUser.username,
-      wallet: walletDetails.walletAddress,
-      tickets: 5,
-    });
-    await insertTONWallet({
-      publicKey: tonWallet.publicKey.toString("hex"),
-      userId: newUser[0].idtg,
-      encryptedPrivateKeyData: encryptedTONData.encryptedData,
-      encryptedPrivateKeyIv: encryptedTONData.iv,
-      address: tonWallet.address,
-    });
-  }
-
-  insertWallet({
-    idtg: tgUser.id,
-    wallet: walletDetails.walletAddress,
-    encryptedData,
-  });
-  // skip for now
-  // faucet(walletDetails.walletAddress);
 };
 
 export const handleMessage = async (
