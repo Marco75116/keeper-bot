@@ -32,3 +32,9 @@ export interface CachedUser {
   yumbarTickets: number;
   attempts: number;
 }
+
+export type SendSolResult = {
+  success: boolean;
+  signature?: string;
+  error?: string;
+};

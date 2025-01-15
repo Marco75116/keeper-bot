@@ -7,7 +7,7 @@ export const viemClient = createPublicClient({
   transport: http(),
 });
 
-const SUPREME_PRIVATE_KEY = process.env.SUPREME_PRIVATE_KEY as `0x${string}`;
+const SUPREME_PRIVATE_KEY = Bun.env.SUPREME_PRIVATE_KEY as `0x${string}`;
 
 if (!SUPREME_PRIVATE_KEY) {
   throw new Error("SUPREME_PRIVATE_KEY must be provided in .env file");
