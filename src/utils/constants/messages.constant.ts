@@ -135,7 +135,8 @@ export const getWalletsMessage = (
   tonWallet: string,
   solWallet: string,
   tonBalance: number,
-  solanaBalance: number
+  solanaBalance: number,
+  totalValue: number
 ): string => {
   const tonLink = getLink("Ton", `https://tonscan.org/address/${tonWallet}`);
   const solLink = getLink("Solana", `https://solscan.io/account/${solWallet}`);
@@ -143,7 +144,7 @@ export const getWalletsMessage = (
   let msg = `
 <b>Your Wallet Overview</b>
 
-💰<b>Total Value:</b> $1,920
+💰<b>Total Value:</b> $${totalValue.toFixed(2).toLocaleString()}
 
   
 🌐 <b>Networks Overview:</b>

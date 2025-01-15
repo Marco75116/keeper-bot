@@ -57,8 +57,11 @@ import {
   ZERO_STRING,
 } from "../../constants/global.constant";
 import type { BuyConstructor } from "../../types/global.type";
-import { getTONBalance } from "../../helpers/ton.helper";
-import { getSOLBalance } from "../../helpers/solana.helper";
+import { getTONBalance, getTonPriceFromCache } from "../../helpers/ton.helper";
+import {
+  getSOLBalance,
+  getSolPriceFromCache,
+} from "../../helpers/solana.helper";
 import { incrementTickets } from "../../helpers/bddqueries/insert.queries.helper";
 
 export const botStart = () => {
@@ -228,7 +231,7 @@ export const botStart = () => {
       getSolWalletPublicKey(userId),
     ]);
 
-    const [tonBalance, solanaBalance] = await Promise.all([
+    const [tonBalance, solanaBalance, tonPrice, solPrice] = await Promise.all([
       getTONBalance(tonWallet).catch((error) => {
         console.error("TON balance fetch error:", error);
         return 0;
@@ -237,11 +240,29 @@ export const botStart = () => {
         console.error("Solana balance fetch error:", error);
         return 0;
       }),
+      getTonPriceFromCache().catch((error) => {
+        console.error("TON price fetch error:", error);
+        return null;
+      }),
+      getSolPriceFromCache().catch((error) => {
+        console.error("SOL price fetch error:", error);
+        return null;
+      }),
     ]);
+
+    const tonValue = tonPrice ? tonBalance * tonPrice : 0;
+    const solValue = solPrice ? solanaBalance * solPrice : 0;
+    const totalValue = tonValue + solValue;
 
     await handleMessage(
       ctx,
-      getWalletsMessage(tonWallet, solanaWallet, tonBalance, solanaBalance),
+      getWalletsMessage(
+        tonWallet,
+        solanaWallet,
+        tonBalance,
+        solanaBalance,
+        totalValue
+      ),
       getKeeperHomeKeyboard()
     );
   });
