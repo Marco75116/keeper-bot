@@ -28,6 +28,7 @@ import {
 } from "../keyboards/global.keyboards";
 import {
   createInvoiceLink,
+  getPriceInCrypto,
   handleAttempt,
   handleBuyCustom,
   handleMessage,
@@ -292,13 +293,23 @@ export const botStart = () => {
   bot.action(BUY_ACTIONS.TON, async (ctx) => {
     await ctx.answerCbQuery();
     const buyObject = await handleSetNetworkBuyAction(ctx.from.id, "TON");
-    handleMessage(ctx, getBuyCryptoMessage(buyObject), getBuyCryptoKeyboard());
+    const totalPriceInCrypto = await getPriceInCrypto(buyObject);
+    handleMessage(
+      ctx,
+      getBuyCryptoMessage(buyObject, totalPriceInCrypto),
+      getBuyCryptoKeyboard()
+    );
   });
 
   bot.action(BUY_ACTIONS.SOLANA, async (ctx) => {
     await ctx.answerCbQuery();
     const buyObject = await handleSetNetworkBuyAction(ctx.from.id, "SOL");
-    handleMessage(ctx, getBuyCryptoMessage(buyObject), getBuyCryptoKeyboard());
+    const totalPriceInCrypto = await getPriceInCrypto(buyObject);
+    handleMessage(
+      ctx,
+      getBuyCryptoMessage(buyObject, totalPriceInCrypto),
+      getBuyCryptoKeyboard()
+    );
   });
 
   bot.action(BUY_ACTIONS.SEND_STARS, async (ctx) => {
@@ -308,9 +319,10 @@ export const botStart = () => {
   });
   bot.action(BUY_ACTIONS.CRYPTO, async (ctx) => {
     await ctx.answerCbQuery();
+
     handleMessage(
       ctx,
-      getBuyCryptoMessage(buyConstructorEmpty),
+      getBuyCryptoMessage(buyConstructorEmpty, 0),
       getBuyCryptoKeyboard()
     );
   });
@@ -325,9 +337,11 @@ export const botStart = () => {
         getBuyStarsKeyboard()
       );
     } else {
+      const totalPriceInCrypto = await getPriceInCrypto(buyObject);
+
       handleMessage(
         ctx,
-        getBuyCryptoMessage(buyObject),
+        getBuyCryptoMessage(buyObject, totalPriceInCrypto),
         getBuyCryptoKeyboard()
       );
     }
@@ -343,9 +357,10 @@ export const botStart = () => {
         getBuyStarsKeyboard()
       );
     } else {
+      const totalPriceInCrypto = await getPriceInCrypto(buyObject);
       handleMessage(
         ctx,
-        getBuyCryptoMessage(buyObject),
+        getBuyCryptoMessage(buyObject, totalPriceInCrypto),
         getBuyCryptoKeyboard()
       );
     }

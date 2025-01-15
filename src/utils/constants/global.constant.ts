@@ -32,3 +32,5 @@ export const SOL_PRICE_CACHE_KEY = "SOL:PRICE";
 
 export const TON_PRICE_CACHE_EXPIRY = 300;
 export const TON_PRICE_CACHE_KEY = "TON:PRICE";
+
+export const TICKET_PRICE_USD = 0.8;

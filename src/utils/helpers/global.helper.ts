@@ -1,4 +1,4 @@
-import type { InlineKeyboardMarkup, User } from "telegraf/types";
+import type { InlineKeyboardMarkup } from "telegraf/types";
 import type {
   BuyConstructor,
   EncryptedData,
@@ -33,9 +33,12 @@ import {
 import {
   buyConstructorEmpty,
   TICKET_PRICE_IN_STARS,
+  TICKET_PRICE_USD,
   URL_KEEPER,
 } from "../constants/global.constant";
 import { buy_PREFIX } from "../tg/actions/global.actions";
+import { getSolPriceFromCache } from "./solana.helper";
+import { getTonPriceFromCache } from "./ton.helper";
 
 const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY;
 
@@ -119,17 +122,26 @@ export const handleBuyCustom = async (ctx: any) => {
 
   const buyObject = await handleSetAmountBuyAction(ctx.from.id, numAmount);
 
+  console.log(buyObject);
+
   const chatIdKey = getChatId(ctx.chat.id);
   const messageId = await redisClient.get(chatIdKey);
 
   if (buyObject.network === "XTR") {
-    handleMessage(
+    await handleMessage(
       ctx,
       getBuyStarsMessage(buyObject.amount),
-      getBuyStarsKeyboard()
+      getBuyStarsKeyboard(),
+      Number(messageId)
     );
   } else {
-    handleMessage(ctx, getBuyCryptoMessage(buyObject), getBuyCryptoKeyboard());
+    const totalPriceInCrypto = await getPriceInCrypto(buyObject);
+    await handleMessage(
+      ctx,
+      getBuyCryptoMessage(buyObject, totalPriceInCrypto),
+      getBuyCryptoKeyboard(),
+      Number(messageId)
+    );
   }
 };
 const startLoading = async (chatId: number, messageId: string) => {
@@ -351,5 +363,41 @@ export async function createInvoiceLink(
     return link;
   } catch (e) {
     throw e;
+  }
+}
+
+export async function getPriceInCrypto(
+  buyObject: BuyConstructor
+): Promise<number> {
+  try {
+    if (buyObject.network === "" || buyObject.amount == "") {
+      return 0;
+    }
+
+    const numTickets = Number(buyObject.amount);
+    if (isNaN(numTickets)) {
+      throw new Error("Invalid ticket amount");
+    }
+
+    const totalUsdCost = numTickets * TICKET_PRICE_USD;
+
+    switch (buyObject.network) {
+      case "SOL": {
+        const solPrice = await getSolPriceFromCache();
+        if (!solPrice) return 0;
+        return totalUsdCost / solPrice;
+      }
+
+      case "TON": {
+        const tonPrice = await getTonPriceFromCache();
+        if (!tonPrice) return 0;
+        return totalUsdCost / tonPrice;
+      }
+      default:
+        return 0;
+    }
+  } catch (error) {
+    console.error("Error calculating crypto amount:", error);
+    return 0;
   }
 }

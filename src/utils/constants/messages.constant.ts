@@ -174,11 +174,14 @@ export const getBuyStarsMessage = (amount: string) => {
   return msg;
 };
 
-export const getBuyCryptoMessage = (buyObject: BuyConstructor) => {
+export const getBuyCryptoMessage = (
+  buyObject: BuyConstructor,
+  priceInCrypto: number
+) => {
   let msg = `🪙 <b>BUY WITH CRYPTO</b>\n\n`;
   msg += `🌐 <b>Network:</b> ${buyObject.network?.trim() || "..."}\n`;
   msg += `🎟️ <b>Tickets:</b> ${buyObject.amount?.trim() || "..."}\n`;
-  msg += `💰 <b>Total:</b> ${buyObject.amount?.trim() || "..."} ${
+  msg += `💰 <b>Total:</b> ${priceInCrypto.toFixed(4) || "..."} ${
     buyObject.network === "TON"
       ? "TON"
       : buyObject.network === "SOL"
