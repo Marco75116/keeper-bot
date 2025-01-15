@@ -2,8 +2,8 @@ import { message } from "telegraf/filters";
 import { bot } from "../../clients/telegraf.client";
 import {
   formatPromptHistory,
-  getBuyMessage,
   getChallengeMessage,
+  paymentOptionsMessage,
   getPaymentSuccessMessage,
   getPoolPrizeMessage,
   getRandomRiddle,
@@ -11,14 +11,18 @@ import {
   HELP_MESSAGE,
   KEEPER_HOME_MESSAGE,
   WELCOME_MESSAGE,
+  getBuyStarsMessage,
+  getBuyCryptoMessage,
 } from "../../constants/messages.constant";
 import {
   getAttemptKeyBoard,
-  getBuyKeyboard,
-  getBuyStarsKeyBoard,
+  getBuyCryptoKeyboard,
+  getBuyStarsKeyboard,
+  getBuyStarsKeyConfimationBoard,
   getChallengeKeyBoard,
   getEmptyKeyBoard,
   getKeeperHomeKeyboard,
+  getPaymentOptionsKeyboard,
   getPaymentSuccessKeyBoard,
   getWelcomeKeyboard,
 } from "../keyboards/global.keyboards";
@@ -50,6 +54,7 @@ import {
   ATTEMPT_PREFIX,
   buyConstructorEmpty,
   TICKET_PRICE_IN_STARS,
+  ZERO_STRING,
 } from "../../constants/global.constant";
 import type { BuyConstructor } from "../../types/global.type";
 import { getTONBalance } from "../../helpers/ton.helper";
@@ -254,8 +259,8 @@ export const botStart = () => {
 
     await handleMessage(
       ctx,
-      getBuyMessage(buyConstructorEmpty),
-      getBuyKeyboard()
+      paymentOptionsMessage,
+      getPaymentOptionsKeyboard()
     );
   });
 
@@ -266,32 +271,65 @@ export const botStart = () => {
   bot.action(BUY_ACTIONS.TON, async (ctx) => {
     await ctx.answerCbQuery();
     const buyObject = await handleSetNetworkBuyAction(ctx.from.id, "TON");
-    handleMessage(ctx, getBuyMessage(buyObject), getBuyKeyboard());
+    handleMessage(ctx, getBuyCryptoMessage(buyObject), getBuyCryptoKeyboard());
   });
 
   bot.action(BUY_ACTIONS.SOLANA, async (ctx) => {
     await ctx.answerCbQuery();
     const buyObject = await handleSetNetworkBuyAction(ctx.from.id, "SOL");
-    handleMessage(ctx, getBuyMessage(buyObject), getBuyKeyboard());
+    handleMessage(ctx, getBuyCryptoMessage(buyObject), getBuyCryptoKeyboard());
   });
 
   bot.action(BUY_ACTIONS.SEND_STARS, async (ctx) => {
     await ctx.answerCbQuery();
-    const buyObject = await handleSetNetworkBuyAction(ctx.from.id, "XTR");
-    handleMessage(ctx, getBuyMessage(buyObject), getBuyKeyboard());
+    await handleSetNetworkBuyAction(ctx.from.id, "XTR");
+    handleMessage(ctx, getBuyStarsMessage(ZERO_STRING), getBuyStarsKeyboard());
+  });
+  bot.action(BUY_ACTIONS.CRYPTO, async (ctx) => {
+    await ctx.answerCbQuery();
+    handleMessage(
+      ctx,
+      getBuyCryptoMessage(buyConstructorEmpty),
+      getBuyCryptoKeyboard()
+    );
   });
 
   bot.action(BUY_ACTIONS.ONE, async (ctx) => {
     await ctx.answerCbQuery();
     const buyObject = await handleSetAmountBuyAction(ctx.from.id, 1);
-    handleMessage(ctx, getBuyMessage(buyObject), getBuyKeyboard());
+    if (buyObject.network === "XTR") {
+      handleMessage(
+        ctx,
+        getBuyStarsMessage(buyObject.amount),
+        getBuyStarsKeyboard()
+      );
+    } else {
+      handleMessage(
+        ctx,
+        getBuyCryptoMessage(buyObject),
+        getBuyCryptoKeyboard()
+      );
+    }
   });
 
   bot.action(BUY_ACTIONS.FIVE, async (ctx) => {
     await ctx.answerCbQuery();
     const buyObject = await handleSetAmountBuyAction(ctx.from.id, 5);
-    handleMessage(ctx, getBuyMessage(buyObject), getBuyKeyboard());
+    if (buyObject.network === "XTR") {
+      handleMessage(
+        ctx,
+        getBuyStarsMessage(buyObject.amount),
+        getBuyStarsKeyboard()
+      );
+    } else {
+      handleMessage(
+        ctx,
+        getBuyCryptoMessage(buyObject),
+        getBuyCryptoKeyboard()
+      );
+    }
   });
+
   bot.action(BUY_ACTIONS.AMOUNT, async (ctx) => {
     await ctx.answerCbQuery();
 
@@ -341,8 +379,8 @@ export const botStart = () => {
       const link = await createInvoiceLink(ctx, parsedAmountTicket);
       handleMessage(
         ctx,
-        getBuyMessage(buytokenObject),
-        getBuyStarsKeyBoard(link, amountStarsPrice)
+        getBuyStarsMessage(buytokenObject.amount),
+        getBuyStarsKeyConfimationBoard(link, amountStarsPrice)
       );
     }
   });

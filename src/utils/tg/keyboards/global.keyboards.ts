@@ -71,12 +71,23 @@ export const getAttemptKeyBoard = () => {
   ]);
 };
 
-export const getBuyKeyboard = () => {
+export const getPaymentOptionsKeyboard = () => {
+  return Markup.inlineKeyboard([
+    [
+      Markup.button.callback("⭐️ Pay with Stars", BUY_ACTIONS.SEND_STARS),
+      Markup.button.callback("🪙 Pay with Crypto", BUY_ACTIONS.CRYPTO),
+    ],
+    [
+      Markup.button.callback("⬅️ Back", KEEPER_HOME_ACTIONS.HOME),
+      Markup.button.callback("✕ Close", "close"),
+    ],
+  ]);
+};
+export const getBuyCryptoKeyboard = () => {
   return Markup.inlineKeyboard([
     [
       Markup.button.callback("🌿 TON", BUY_ACTIONS.TON),
       Markup.button.callback("🌉 Solana", BUY_ACTIONS.SOLANA),
-      Markup.button.callback("⭐️ Stars", BUY_ACTIONS.SEND_STARS),
     ],
     [
       Markup.button.callback(
@@ -91,13 +102,36 @@ export const getBuyKeyboard = () => {
     ],
     [Markup.button.callback("✅ CONFIRMATION", BUY_ACTIONS.CONFIRMATION)],
     [
-      Markup.button.callback("⬅️ Back", KEEPER_HOME_ACTIONS.HOME),
+      Markup.button.callback("⬅️ Back", KEEPER_HOME_ACTIONS.BUY),
       Markup.button.callback("✕ Close", KEEPER_HOME_ACTIONS.CLOSE),
     ],
   ]);
 };
 
-export const getBuyStarsKeyBoard = (invoiceLink: string, amount: Number) => {
+export const getBuyStarsKeyboard = () => {
+  return Markup.inlineKeyboard([
+    [
+      Markup.button.callback(
+        "🔢 SELECT AN AMOUNT 🔢",
+        BUY_ACTIONS.SELECTANAMOUNT
+      ),
+    ],
+    [
+      Markup.button.callback("1", BUY_ACTIONS.ONE),
+      Markup.button.callback("5", BUY_ACTIONS.FIVE),
+      Markup.button.callback("✏️ Custom", BUY_ACTIONS.AMOUNT),
+    ],
+    [Markup.button.callback("✅ CONFIRMATION", BUY_ACTIONS.CONFIRMATION)],
+    [
+      Markup.button.callback("⬅️ Back", KEEPER_HOME_ACTIONS.BUY),
+      Markup.button.callback("✕ Close", KEEPER_HOME_ACTIONS.CLOSE),
+    ],
+  ]);
+};
+export const getBuyStarsKeyConfimationBoard = (
+  invoiceLink: string,
+  amount: Number
+) => {
   return Markup.inlineKeyboard([
     [Markup.button.url(`Pay ${amount} Stars ⭐️`, invoiceLink)],
     [

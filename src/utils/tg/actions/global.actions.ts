@@ -26,4 +26,5 @@ export const BUY_ACTIONS = {
   ONE: `${buy_PREFIX}-one`,
   FIVE: `${buy_PREFIX}-FIVE`,
   SEND_STARS: `${buy_PREFIX}-send_stars`,
+  CRYPTO: `${buy_PREFIX}-crypto`,
 };

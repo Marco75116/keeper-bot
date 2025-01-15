@@ -161,31 +161,43 @@ export const getWalletsMessage = (
   return msg;
 };
 
-export const getBuyMessage = (params: BuyConstructor) => {
-  const { network, amount } = params;
-
-  const formatValue = (value: string) => value?.trim() || "...";
+export const getBuyStarsMessage = (amount: string) => {
   const totalStars = Number(amount) * TICKET_PRICE_IN_STARS;
 
-  if (network === "XTR") {
-    let msg = `⭐️ <b>BUY WITH STARS</b>\n\n`;
-    msg += `1 🎟️ = ${TICKET_PRICE_IN_STARS} ⭐️\n\n`;
-    msg += `🎟️ <b>Tickets:</b> ${formatValue(amount)}\n`;
-    msg += `✨ <b>Total:</b> ${totalStars} \n\n`;
-    msg += `Ready to shine? Click confirmation to proceed with your purchase with stars! 🌟`;
-    return msg;
-  }
+  let msg = `⭐️ <b>BUY WITH STARS</b>\n\n`;
+  msg += `1 🎟️ = ${TICKET_PRICE_IN_STARS} ⭐️\n\n`;
+  msg += `🎟️ <b>Tickets:</b> ${amount?.trim() || "..."}\n`;
+  msg += `✨ <b>Total:</b> ${totalStars} \n\n`;
+  msg += `Ready to shine? Click confirmation to proceed with your purchase with stars! 🌟`;
 
+  return msg;
+};
+
+export const getBuyCryptoMessage = (buyObject: BuyConstructor) => {
   let msg = `🪙 <b>BUY WITH CRYPTO</b>\n\n`;
-  msg += `🌐 <b>Network:</b> ${formatValue(network)}\n`;
-  msg += `🎟️ <b>Tickets:</b> ${formatValue(amount)}\n`;
-  msg += `💰 <b>Total:</b> ${formatValue(amount)} ${
-    network === "TON" ? "TON" : network === "SOL" ? "SOL" : ""
+  msg += `🌐 <b>Network:</b> ${buyObject.network?.trim() || "..."}\n`;
+  msg += `🎟️ <b>Tickets:</b> ${buyObject.amount?.trim() || "..."}\n`;
+  msg += `💰 <b>Total:</b> ${buyObject.amount?.trim() || "..."} ${
+    buyObject.network === "TON"
+      ? "TON"
+      : buyObject.network === "SOL"
+      ? "SOL"
+      : ""
   }\n\n`;
   msg += `Please review the purchase details carefully. Once confirmed, the transfer will be initiated. 🔐`;
 
   return msg;
 };
+
+export const paymentOptionsMessage = `🎟️ <b>Choose Your Payment Method</b>
+
+⭐️ <b>Stars</b>
+Pay directly with Telegram Stars - quick and easy!
+
+🪙 <b>Cryptocurrency</b>
+Pay with TON or SOL.
+
+Select your preferred payment method below 👇`;
 
 export const getPaymentSuccessMessage = (tickets: number) => {
   return `✨ <b>Payment Successful!</b>

@@ -21,11 +21,13 @@ import {
 } from "./bddqueries/get.queries.helper";
 import {
   formatAttemptConversation,
-  getBuyMessage,
+  getBuyCryptoMessage,
+  getBuyStarsMessage,
 } from "../constants/messages.constant";
 import {
   getAttemptKeyBoard,
-  getBuyKeyboard,
+  getBuyCryptoKeyboard,
+  getBuyStarsKeyboard,
   getEmptyKeyBoard,
 } from "../tg/keyboards/global.keyboards";
 import {
@@ -120,12 +122,15 @@ export const handleBuyCustom = async (ctx: any) => {
   const chatIdKey = getChatId(ctx.chat.id);
   const messageId = await redisClient.get(chatIdKey);
 
-  await handleMessage(
-    ctx,
-    getBuyMessage(buyObject),
-    getBuyKeyboard(),
-    Number(messageId)
-  );
+  if (buyObject.network === "XTR") {
+    handleMessage(
+      ctx,
+      getBuyStarsMessage(buyObject.amount),
+      getBuyStarsKeyboard()
+    );
+  } else {
+    handleMessage(ctx, getBuyCryptoMessage(buyObject), getBuyCryptoKeyboard());
+  }
 };
 const startLoading = async (chatId: number, messageId: string) => {
   let isProcessing = true;
