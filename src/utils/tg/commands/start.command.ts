@@ -15,6 +15,7 @@ import {
   getBuyCryptoMessage,
   getSolPaymentSuccessMessage,
   loadingStatesTx,
+  getTONPaymentSuccessMessage,
 } from "../../constants/messages.constant";
 import {
   getAttemptKeyBoard,
@@ -61,7 +62,12 @@ import {
   ZERO_STRING,
 } from "../../constants/global.constant";
 import type { BuyConstructor } from "../../types/global.type";
-import { getTONBalance, getTonPriceFromCache } from "../../helpers/ton.helper";
+import {
+  getTONBalance,
+  getTonKeysByTelegramId,
+  getTonPriceFromCache,
+  sendTon,
+} from "../../helpers/ton.helper";
 import {
   getPrivateSolKeyByTelegramId,
   getSOLBalance,
@@ -462,6 +468,52 @@ export const botStart = () => {
           getSolPaymentSuccessMessage(
             ticketsResponce.tickets,
             resultSolPayment.signature
+          ),
+          getPaymentSuccessKeyBoard()
+        );
+      }
+    } else if (buytokenObject.network === "TON") {
+      const tonAmount = await getPriceInCrypto(buytokenObject);
+      const walletKeys = await getTonKeysByTelegramId(userId);
+
+      if (!walletKeys.privateKey || !walletKeys.publicKey) {
+        console.error("TON payment error while retrieving wallet keys");
+        return;
+      }
+
+      const { loadingPromise, stopLoading } = await startLoading(
+        userId,
+        String(ctx.update.callback_query.message?.message_id),
+        loadingStatesTx
+      );
+
+      const resultTonPayment = await sendTon({
+        privateKey: walletKeys.privateKey,
+        publicKey: walletKeys.publicKey,
+        amount: Number(tonAmount),
+      });
+
+      stopLoading();
+      await loadingPromise;
+
+      if (resultTonPayment.success && resultTonPayment.hash) {
+        const ticketsResponse = await incrementTickets(
+          userId,
+          Number(buytokenObject.amount)
+        );
+
+        setCachedUser(userId);
+
+        if (!ticketsResponse.success || ticketsResponse.tickets === undefined) {
+          console.error("Failed to increment tickets");
+          return;
+        }
+
+        handleMessage(
+          ctx,
+          getTONPaymentSuccessMessage(
+            ticketsResponse.tickets,
+            resultTonPayment.hash
           ),
           getPaymentSuccessKeyBoard()
         );

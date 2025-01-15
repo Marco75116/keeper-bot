@@ -217,12 +217,26 @@ export const getSolPaymentSuccessMessage = (
   tickets: number,
   signature: string
 ): string => {
-  const solTwLink = getLink("View tx", `https://solscan.io/tx/${signature}`);
+  const solTxLink = getLink("View tx", `https://solscan.io/tx/${signature}`);
   return `✨ <b>Payment Successful!</b>
 
 Your current ticket balance: ${tickets} 🎟
 
-${solTwLink} 🔎 
+${solTxLink} 🔎 
+
+Good luck breaking the vault! 🔒`;
+};
+
+export const getTONPaymentSuccessMessage = (
+  tickets: number,
+  hash: string
+): string => {
+  const tonTxLink = getLink("View tx", `https://tonscan.org/tx/${hash}`);
+  return `✨ <b>Payment Successful!</b>
+
+Your current ticket balance: ${tickets} 🎟
+
+${tonTxLink} 🔎 
 
 Good luck breaking the vault! 🔒`;
 };
@@ -234,6 +248,6 @@ export const loadingStatesPrompt = [
 
 export const loadingStatesTx = [
   "💎 Processing transaction...",
-  "🔄 Confirming on Solana network...",
+  "🔄 Confirming on network...",
   "⚡ Waiting for confirmation...",
 ];

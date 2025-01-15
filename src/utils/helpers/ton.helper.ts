@@ -6,7 +6,12 @@ import {
   WalletContractV5R1,
 } from "@ton/ton";
 import { mnemonicToPrivateKey, mnemonicNew } from "@ton/crypto";
-import { TON_PROJECT_WALLET, tonClient } from "../clients/ton.client";
+import {
+  projectWalletAddress,
+  TON_PROJECT_WALLET,
+  tonClient,
+  tonweb,
+} from "../clients/ton.client";
 import {
   TON_DECIMALS,
   TON_PRICE_CACHE_EXPIRY,
@@ -167,7 +172,37 @@ export const getTonKeysByTelegramId = async (
   }
 };
 
-export async function sendTon({
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+async function waitForTransactionComplete(
+  address: string
+): Promise<string | null> {
+  let attempts = 0;
+  const maxAttempts = 15;
+
+  while (attempts < maxAttempts) {
+    await sleep(2000);
+
+    try {
+      const transactions = await tonweb.getTransactions(address, 1);
+
+      if (transactions && transactions.length > 0) {
+        const tx = transactions[0];
+
+        if (tx.out_msgs?.[0]?.destination === projectWalletAddress) {
+          return tx.transaction_id.hash;
+        }
+      }
+    } catch (error) {
+      console.error("Error checking transaction:", error);
+    }
+
+    attempts++;
+  }
+
+  return null;
+}
+export const sendTon = async ({
   privateKey,
   publicKey,
   amount,
@@ -175,7 +210,7 @@ export async function sendTon({
   privateKey: string;
   publicKey: string;
   amount: number;
-}): Promise<SendTonResult> {
+}): Promise<SendTonResult> => {
   try {
     const wallet = WalletContractV4.create({
       workchain: 0,
@@ -183,13 +218,9 @@ export async function sendTon({
     });
 
     const contract = tonClient.open(wallet);
-
     const seqno = await contract.getSeqno();
-
     const TON_FEE = 0.0055;
     const adjustedAmount = toNano(amount - TON_FEE);
-
-    const txId = Date.now().toString();
 
     await contract.sendTransfer({
       seqno,
@@ -199,30 +230,27 @@ export async function sendTon({
           value: adjustedAmount,
           to: TON_PROJECT_WALLET,
           bounce: true,
-          body: txId,
         }),
       ],
       sendMode: 1,
     });
 
-    let attempts = 0;
-    while (attempts < 10) {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      const newSeqno = await contract.getSeqno();
-      if (newSeqno > seqno) {
-        return {
-          success: true,
-          hash: txId,
-        };
-      }
-      attempts++;
+    const address = wallet.address.toString();
+
+    const transactionHash = await waitForTransactionComplete(address);
+
+    if (!transactionHash) {
+      throw new Error("Transaction confirmation timeout");
     }
 
-    throw new Error("Transaction confirmation timeout");
+    return {
+      success: true,
+      hash: transactionHash,
+    };
   } catch (error) {
     return {
       success: false,
       error: error instanceof Error ? error.message : "Unknown error occurred",
     };
   }
-}
+};

@@ -26,3 +26,6 @@ if (!TON_PROJECT_WALLET) {
     "TON Project wallet address not found in environment variables"
   );
 }
+export const projectWalletAddress = new TonWeb.utils.Address(
+  TON_PROJECT_WALLET
+).toString(true, true, true);
