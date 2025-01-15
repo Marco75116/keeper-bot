@@ -5,13 +5,23 @@ import {
   Transaction,
 } from "@solana/web3.js";
 import { PROJECT_WALLET, solanaClient } from "../clients/solana.client";
-import { SOLANA_DECIMALS } from "../constants/global.constant";
-import type { EncryptedData, SendSolResult } from "../types/global.type";
+import {
+  SOL_PRICE_CACHE_EXPIRY,
+  SOL_PRICE_CACHE_KEY,
+  SOLANA_DECIMALS,
+} from "../constants/global.constant";
+import type {
+  EncryptedData,
+  SendSolResult,
+  SolPriceResult,
+} from "../types/global.type";
 import { decrypt } from "./global.helper";
 import { cashierWalletSol, user } from "../../db/schema";
 import { db } from "../clients/drizzle.client";
 import { eq } from "drizzle-orm";
 import bs58 from "bs58";
+import ccxt, { Exchange } from "ccxt";
+import { redisClient } from "../clients/redis.client";
 
 export const getSOLBalance = async (addressString: string) => {
   try {
@@ -111,6 +121,79 @@ export async function sendSol({
     return {
       success: true,
       signature,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error occurred",
+    };
+  }
+}
+
+export const setCachedSolPrice = async (
+  currency: string = "USDT"
+): Promise<number | null> => {
+  try {
+    const priceResult = await getSolPrice(currency);
+
+    if (!priceResult.success || !priceResult.price) {
+      console.log("Error retrieving cached SOL price");
+      return null;
+    }
+
+    await redisClient.set(
+      SOL_PRICE_CACHE_KEY,
+      JSON.stringify(priceResult.price),
+      {
+        EX: SOL_PRICE_CACHE_EXPIRY,
+      }
+    );
+
+    return priceResult.price;
+  } catch (error) {
+    console.error("Error setting cached SOL price:", error);
+    return null;
+  }
+};
+
+export const getSolPriceFromCache = async (
+  currency: string = "USDT"
+): Promise<number | null> => {
+  try {
+    const cachedPrice = await redisClient.get(SOL_PRICE_CACHE_KEY);
+    if (cachedPrice) {
+      const parsedPrice = JSON.parse(cachedPrice);
+      return Number(parsedPrice);
+    }
+
+    const newCachedPrice = await setCachedSolPrice(currency);
+    return newCachedPrice ?? null;
+  } catch (error) {
+    console.error("Error fetching SOL price from cache:", error);
+    return null;
+  }
+};
+
+export async function getSolPrice(
+  currency: string = "USDT",
+  exchangeName: keyof typeof ccxt = "binance"
+): Promise<SolPriceResult> {
+  try {
+    const exchange: Exchange = new (ccxt[exchangeName] as any)({
+      enableRateLimit: true,
+    });
+
+    const symbol = `SOL/${currency}`;
+
+    const ticker = await exchange.fetchTicker(symbol);
+
+    if (!ticker || !ticker.last) {
+      throw new Error("Could not fetch SOL price");
+    }
+
+    return {
+      success: true,
+      price: ticker.last,
     };
   } catch (error) {
     return {

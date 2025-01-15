@@ -38,3 +38,9 @@ export type SendSolResult = {
   signature?: string;
   error?: string;
 };
+
+export type SolPriceResult = {
+  success: boolean;
+  price?: number;
+  error?: string;
+};

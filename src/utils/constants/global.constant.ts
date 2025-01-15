@@ -26,3 +26,7 @@ export const SOLANA_DECIMALS = 9;
 export const TICKET_PRICE_IN_STARS = 40;
 
 export const ZERO_STRING = "0";
+
+export const SOL_PRICE_CACHE_EXPIRY = 180;
+
+export const SOL_PRICE_CACHE_KEY = "SOL";
