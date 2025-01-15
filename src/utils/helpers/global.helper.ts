@@ -23,6 +23,7 @@ import {
   formatAttemptConversation,
   getBuyCryptoMessage,
   getBuyStarsMessage,
+  loadingStatesPrompt,
 } from "../constants/messages.constant";
 import {
   getAttemptKeyBoard,
@@ -142,12 +143,12 @@ export const handleBuyCustom = async (ctx: any) => {
     );
   }
 };
-const startLoading = async (chatId: number, messageId: string) => {
+export const startLoading = async (
+  chatId: number,
+  messageId: string,
+  loadingStates: string[]
+) => {
   let isProcessing = true;
-  const loadingStates = [
-    "🤖 Keeper is thinking...",
-    "⚡ Analyzing your answer...",
-  ];
 
   const loadingLoop = async () => {
     let i = 0;
@@ -183,7 +184,11 @@ export const handleAttempt = async (ctx: any) => {
 
   if (!messageId) return;
 
-  const { loadingPromise, stopLoading } = await startLoading(chatId, messageId);
+  const { loadingPromise, stopLoading } = await startLoading(
+    chatId,
+    messageId,
+    loadingStatesPrompt
+  );
 
   try {
     const { data, success, error } = await sendChatMessage(ctx.message.text);

@@ -226,3 +226,14 @@ ${solTwLink} 🔎
 
 Good luck breaking the vault! 🔒`;
 };
+
+export const loadingStatesPrompt = [
+  "🤖 Keeper is thinking...",
+  "⚡ Analyzing your answer...",
+];
+
+export const loadingStatesTx = [
+  "💎 Processing transaction...",
+  "🔄 Confirming on Solana network...",
+  "⚡ Waiting for confirmation...",
+];

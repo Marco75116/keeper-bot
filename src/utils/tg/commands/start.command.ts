@@ -14,6 +14,7 @@ import {
   getBuyStarsMessage,
   getBuyCryptoMessage,
   getSolPaymentSuccessMessage,
+  loadingStatesTx,
 } from "../../constants/messages.constant";
 import {
   getAttemptKeyBoard,
@@ -35,6 +36,7 @@ import {
   handleMessage,
   handleSetAmountBuyAction,
   handleSetNetworkBuyAction,
+  startLoading,
 } from "../../helpers/global.helper";
 import {
   getAttemptsByIdTg,
@@ -395,6 +397,7 @@ export const botStart = () => {
   bot.action(BUY_ACTIONS.CONFIRMATION, async (ctx) => {
     await ctx.answerCbQuery();
     const userId = ctx.from.id;
+    const chatId = ctx.chat?.id;
     const buyObjectString = await redisClient.get(`${buy_PREFIX}:${userId}`);
     if (!buyObjectString) return;
     const buytokenObject: BuyConstructor = JSON.parse(buyObjectString);
@@ -428,10 +431,19 @@ export const botStart = () => {
         return;
       }
 
+      const { loadingPromise, stopLoading } = await startLoading(
+        userId,
+        String(ctx.update.callback_query.message?.message_id),
+        loadingStatesTx
+      );
+
       const resultSolPayment = await sendSol({
         privateKey: pk,
         amount: Number(solAmount),
       });
+
+      stopLoading();
+      await loadingPromise;
 
       if (resultSolPayment.success && resultSolPayment.signature) {
         const ticketsResponce = await incrementTickets(
