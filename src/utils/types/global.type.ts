@@ -44,3 +44,9 @@ export type SolPriceResult = {
   price?: number;
   error?: string;
 };
+
+export type TonPriceResult = {
+  success: boolean;
+  price?: number;
+  error?: string;
+};
