@@ -1,15 +1,29 @@
-import { Address, WalletContractV5R1 } from "@ton/ton";
+import {
+  Address,
+  internal,
+  toNano,
+  WalletContractV4,
+  WalletContractV5R1,
+} from "@ton/ton";
 import { mnemonicToPrivateKey, mnemonicNew } from "@ton/crypto";
-import { tonClient } from "../clients/ton.client";
+import { TON_PROJECT_WALLET, tonClient } from "../clients/ton.client";
 import {
   TON_DECIMALS,
   TON_PRICE_CACHE_EXPIRY,
   TON_PRICE_CACHE_KEY,
 } from "../constants/global.constant";
-import type { TonPriceResult } from "../types/global.type";
+import type {
+  EncryptedData,
+  SendTonResult,
+  TonPriceResult,
+} from "../types/global.type";
 import type { Exchange } from "ccxt";
 import ccxt from "ccxt";
 import { redisClient } from "../clients/redis.client";
+import { cashierWalletTon, user } from "../../db/schema";
+import { eq } from "drizzle-orm";
+import { db } from "../clients/drizzle.client";
+import { decrypt } from "./global.helper";
 
 export const getTONBalance = async (addressString: string) => {
   try {
@@ -111,3 +125,104 @@ export const getTonPriceFromCache = async (
     return null;
   }
 };
+
+export const getTonKeysByTelegramId = async (
+  telegramId: number
+): Promise<{ privateKey: string | null; publicKey: string | null }> => {
+  try {
+    const walletData = await db
+      .select({
+        encryptedPrivateKeyData: cashierWalletTon.encryptedPrivateKeyData,
+        encryptedPrivateKeyIv: cashierWalletTon.encryptedPrivateKeyIv,
+        publicKey: cashierWalletTon.publicKey,
+      })
+      .from(cashierWalletTon)
+      .innerJoin(user, eq(user.id, cashierWalletTon.userId))
+      .where(eq(user.telegramId, telegramId))
+      .limit(1);
+
+    if (!walletData.length) {
+      throw new Error("No TON wallet found for this telegram user");
+    }
+
+    const wallet = walletData[0];
+
+    const encryptedObject: EncryptedData = {
+      encryptedData: wallet.encryptedPrivateKeyData,
+      iv: wallet.encryptedPrivateKeyIv,
+    };
+
+    const privateKey = decrypt(encryptedObject);
+
+    return {
+      privateKey,
+      publicKey: wallet.publicKey,
+    };
+  } catch (error) {
+    console.error("Error retrieving TON private key:", error);
+    return {
+      privateKey: null,
+      publicKey: null,
+    };
+  }
+};
+
+export async function sendTon({
+  privateKey,
+  publicKey,
+  amount,
+}: {
+  privateKey: string;
+  publicKey: string;
+  amount: number;
+}): Promise<SendTonResult> {
+  try {
+    const wallet = WalletContractV4.create({
+      workchain: 0,
+      publicKey: Buffer.from(publicKey, "hex"),
+    });
+
+    const contract = tonClient.open(wallet);
+
+    const seqno = await contract.getSeqno();
+
+    const TON_FEE = 0.0055;
+    const adjustedAmount = toNano(amount - TON_FEE);
+
+    const txId = Date.now().toString();
+
+    await contract.sendTransfer({
+      seqno,
+      secretKey: Buffer.from(privateKey, "hex"),
+      messages: [
+        internal({
+          value: adjustedAmount,
+          to: TON_PROJECT_WALLET,
+          bounce: true,
+          body: txId,
+        }),
+      ],
+      sendMode: 1,
+    });
+
+    let attempts = 0;
+    while (attempts < 10) {
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      const newSeqno = await contract.getSeqno();
+      if (newSeqno > seqno) {
+        return {
+          success: true,
+          hash: txId,
+        };
+      }
+      attempts++;
+    }
+
+    throw new Error("Transaction confirmation timeout");
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error occurred",
+    };
+  }
+}

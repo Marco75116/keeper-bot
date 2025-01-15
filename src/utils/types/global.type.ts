@@ -39,6 +39,12 @@ export type SendSolResult = {
   error?: string;
 };
 
+export type SendTonResult = {
+  success: boolean;
+  hash?: string;
+  error?: string;
+};
+
 export type SolPriceResult = {
   success: boolean;
   price?: number;
