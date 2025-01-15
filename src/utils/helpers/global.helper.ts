@@ -122,8 +122,6 @@ export const handleBuyCustom = async (ctx: any) => {
 
   const buyObject = await handleSetAmountBuyAction(ctx.from.id, numAmount);
 
-  console.log(buyObject);
-
   const chatIdKey = getChatId(ctx.chat.id);
   const messageId = await redisClient.get(chatIdKey);
 

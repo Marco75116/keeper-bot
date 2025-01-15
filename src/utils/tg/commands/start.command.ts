@@ -13,6 +13,7 @@ import {
   WELCOME_MESSAGE,
   getBuyStarsMessage,
   getBuyCryptoMessage,
+  getSolPaymentSuccessMessage,
 } from "../../constants/messages.constant";
 import {
   getAttemptKeyBoard,
@@ -60,8 +61,10 @@ import {
 import type { BuyConstructor } from "../../types/global.type";
 import { getTONBalance, getTonPriceFromCache } from "../../helpers/ton.helper";
 import {
+  getPrivateSolKeyByTelegramId,
   getSOLBalance,
   getSolPriceFromCache,
+  sendSol,
 } from "../../helpers/solana.helper";
 import { incrementTickets } from "../../helpers/bddqueries/insert.queries.helper";
 
@@ -391,9 +394,8 @@ export const botStart = () => {
 
   bot.action(BUY_ACTIONS.CONFIRMATION, async (ctx) => {
     await ctx.answerCbQuery();
-    const buyObjectString = await redisClient.get(
-      `${buy_PREFIX}:${ctx.from.id}`
-    );
+    const userId = ctx.from.id;
+    const buyObjectString = await redisClient.get(`${buy_PREFIX}:${userId}`);
     if (!buyObjectString) return;
     const buytokenObject: BuyConstructor = JSON.parse(buyObjectString);
 
@@ -418,6 +420,40 @@ export const botStart = () => {
         getBuyStarsMessage(buytokenObject.amount),
         getBuyStarsKeyConfimationBoard(link, amountStarsPrice)
       );
+    } else if (buytokenObject.network === "SOL") {
+      const solAmount = await getPriceInCrypto(buytokenObject);
+      const pk = await getPrivateSolKeyByTelegramId(userId);
+      if (!pk) {
+        console.error("Sol payment error while retrieve private key");
+        return;
+      }
+
+      const resultSolPayment = await sendSol({
+        privateKey: pk,
+        amount: Number(solAmount),
+      });
+
+      if (resultSolPayment.success && resultSolPayment.signature) {
+        const ticketsResponce = await incrementTickets(
+          userId,
+          Number(buytokenObject.amount)
+        );
+
+        setCachedUser(userId);
+
+        if (!ticketsResponce.success || ticketsResponce.tickets === undefined) {
+          console.error("Failed to increment tickets");
+          return;
+        }
+        handleMessage(
+          ctx,
+          getSolPaymentSuccessMessage(
+            ticketsResponce.tickets,
+            resultSolPayment.signature
+          ),
+          getPaymentSuccessKeyBoard()
+        );
+      }
     }
   });
 };

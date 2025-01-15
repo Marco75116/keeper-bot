@@ -76,7 +76,7 @@ export async function sendSol({
   amount: number;
 }): Promise<SendSolResult> {
   try {
-    const lamports = amount * 1e9;
+    const lamports = Math.round(amount * 1e9);
 
     const decodedKey = bs58.decode(privateKey);
     const senderKeypair = Keypair.fromSecretKey(decodedKey);

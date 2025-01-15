@@ -212,3 +212,17 @@ Your current ticket balance: ${tickets} 🎟
 
 Good luck breaking the vault! 🔒`;
 };
+
+export const getSolPaymentSuccessMessage = (
+  tickets: number,
+  signature: string
+): string => {
+  const solTwLink = getLink("View tx", `https://solscan.io/tx/${signature}`);
+  return `✨ <b>Payment Successful!</b>
+
+Your current ticket balance: ${tickets} 🎟
+
+${solTwLink} 🔎 
+
+Good luck breaking the vault! 🔒`;
+};
