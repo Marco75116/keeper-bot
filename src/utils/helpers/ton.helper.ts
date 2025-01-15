@@ -229,7 +229,7 @@ export const sendTon = async ({
         internal({
           value: adjustedAmount,
           to: TON_PROJECT_WALLET,
-          bounce: true,
+          bounce: false,
         }),
       ],
       sendMode: 1,
