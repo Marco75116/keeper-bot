@@ -114,6 +114,14 @@ export const botStart = () => {
         numberTicketsBought
       );
 
+      insertTicketPurchase({
+        telegramId: userId,
+        amountTickets: numberTicketsBought,
+        network: XTR_TAG,
+        priceInCrypto: payment.total_amount,
+        txHash: payment.telegram_payment_charge_id,
+      });
+
       if (!ticketsResponce.success || ticketsResponce.tickets === undefined) {
         console.error("Failed to increment tickets");
         return;
@@ -532,6 +540,14 @@ export const botStart = () => {
           userId,
           Number(buytokenObject.amount)
         );
+
+        insertTicketPurchase({
+          telegramId: userId,
+          amountTickets: Number(buytokenObject.amount),
+          network: SOL_TAG,
+          priceInCrypto: Number(solAmount),
+          txHash: resultSolPayment.signature,
+        });
 
         setCachedBalances(tonWallet, solanaWallet);
         setCachedUser(userId);
