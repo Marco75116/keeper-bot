@@ -179,7 +179,9 @@ async function waitForTransactionComplete(
 ): Promise<string | null> {
   let attempts = 0;
   const maxAttempts = 15;
-  await sleep(3000);
+  await sleep(2000);
+
+  const startTime = Math.floor(Date.now() / 1000);
 
   while (attempts < maxAttempts) {
     await sleep(2000);
@@ -190,7 +192,12 @@ async function waitForTransactionComplete(
       if (transactions && transactions.length > 0) {
         const tx = transactions[0];
 
-        if (tx.out_msgs?.[0]?.destination === projectWalletAddress) {
+        const timeDiff = startTime - tx.utime;
+
+        if (
+          timeDiff <= 40 &&
+          tx.out_msgs?.[0]?.destination === projectWalletAddress
+        ) {
           return tx.transaction_id.hash;
         }
       }

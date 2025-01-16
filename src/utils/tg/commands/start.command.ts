@@ -496,10 +496,7 @@ export const botStart = () => {
         getSolWalletPublicKey(userId),
       ]);
 
-      const cachedBalances = await getBalancesFromCache(
-        tonWallet,
-        solanaWallet
-      );
+      const cachedBalances = await setCachedBalances(tonWallet, solanaWallet);
       if (!pk) {
         console.error("Sol payment error while retrieve private key");
         return;
@@ -560,10 +557,7 @@ export const botStart = () => {
           getSolWalletPublicKey(userId),
         ]);
 
-      const cachedBalances = await getBalancesFromCache(
-        tonWallet,
-        solanaWallet
-      );
+      const cachedBalances = await setCachedBalances(tonWallet, solanaWallet);
 
       if (!walletKeys.privateKey || !walletKeys.publicKey) {
         console.error("TON payment error while retrieving wallet keys");
