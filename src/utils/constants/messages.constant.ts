@@ -193,7 +193,8 @@ export const getBuyCryptoMessage = (
       ? SOL_TAG
       : ""
   }\n\n`;
-  msg += `Please review the purchase details carefully. Once confirmed, the transfer will be initiated. 🔐`;
+  msg += `Please review the purchase details carefully. Once confirmed, the transfer will be initiated. 🔐\n\n`;
+  msg += `Select the amount of tickets below 👇`;
 
   return msg;
 };
@@ -282,3 +283,9 @@ Missing: ${(requiredAmount - balance).toFixed(4)} ${network}
  
 Please top up your wallet, reload your wallet data and try again.`;
 };
+
+export const chooseNetworkPayment = `🎮 Select Your Payment Network
+
+💎 ${TON_TAG} - Telegram's native token
+🌉 ${SOL_TAG} - Solana blockchain
+`;

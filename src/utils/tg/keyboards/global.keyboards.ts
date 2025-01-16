@@ -92,18 +92,21 @@ export const getPaymentOptionsKeyboard = () => {
     ],
   ]);
 };
-export const getBuyCryptoKeyboard = () => {
+
+export const getBuyCryptoOptionKeyboard = () => {
   return Markup.inlineKeyboard([
     [
       Markup.button.callback("🌿 TON", BUY_ACTIONS.TON),
       Markup.button.callback("🌉 Solana", BUY_ACTIONS.SOLANA),
     ],
     [
-      Markup.button.callback(
-        "🔢 SELECT AN AMOUNT 🔢",
-        BUY_ACTIONS.SELECTANAMOUNT
-      ),
+      Markup.button.callback("⬅️ Back", KEEPER_HOME_ACTIONS.BUY),
+      Markup.button.callback("✕ Close", KEEPER_HOME_ACTIONS.CLOSE),
     ],
+  ]);
+};
+export const getBuyCryptoKeyboard = () => {
+  return Markup.inlineKeyboard([
     [
       Markup.button.callback("1", BUY_ACTIONS.ONE),
       Markup.button.callback("5", BUY_ACTIONS.FIVE),
@@ -111,7 +114,7 @@ export const getBuyCryptoKeyboard = () => {
     ],
     [Markup.button.callback("✅ CONFIRMATION", BUY_ACTIONS.CONFIRMATION)],
     [
-      Markup.button.callback("⬅️ Back", KEEPER_HOME_ACTIONS.BUY),
+      Markup.button.callback("⬅️ Back", BUY_ACTIONS.CRYPTO),
       Markup.button.callback("✕ Close", KEEPER_HOME_ACTIONS.CLOSE),
     ],
   ]);

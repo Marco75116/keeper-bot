@@ -19,10 +19,12 @@ import {
   paymentFailMessage,
   loadingStatesBalance,
   getInsufficientBalanceMessage,
+  chooseNetworkPayment,
 } from "../../constants/messages.constant";
 import {
   getAttemptKeyBoard,
   getBuyCryptoKeyboard,
+  getBuyCryptoOptionKeyboard,
   getBuyStarsKeyboard,
   getBuyStarsKeyConfimationBoard,
   getChallengeKeyBoard,
@@ -398,14 +400,11 @@ export const botStart = () => {
     await handleSetNetworkBuyAction(ctx.from.id, "XTR");
     handleMessage(ctx, getBuyStarsMessage(ZERO_STRING), getBuyStarsKeyboard());
   });
+
   bot.action(BUY_ACTIONS.CRYPTO, async (ctx) => {
     await ctx.answerCbQuery();
 
-    handleMessage(
-      ctx,
-      getBuyCryptoMessage(buyConstructorEmpty, 0),
-      getBuyCryptoKeyboard()
-    );
+    handleMessage(ctx, chooseNetworkPayment, getBuyCryptoOptionKeyboard());
   });
 
   bot.action(BUY_ACTIONS.ONE, async (ctx) => {
