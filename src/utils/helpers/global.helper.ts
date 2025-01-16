@@ -122,11 +122,10 @@ export const handleBuyCustom = async (ctx: any) => {
   if (isNaN(numAmount) || numAmount <= 0) {
     return;
   }
-
-  const buyObject = await handleSetAmountBuyAction(ctx.from.id, numAmount);
-
-  const chatIdKey = getChatId(ctx.chat.id);
-  const messageId = await redisClient.get(chatIdKey);
+  const [buyObject, messageId] = await Promise.all([
+    handleSetAmountBuyAction(ctx.from.id, numAmount),
+    redisClient.get(getChatId(ctx.chat.id)),
+  ]);
 
   if (buyObject.network === "XTR") {
     await handleMessage(
@@ -145,6 +144,7 @@ export const handleBuyCustom = async (ctx: any) => {
     );
   }
 };
+
 export const startLoading = async (
   chatId: number,
   messageId: string,
@@ -210,9 +210,10 @@ export const handleAttempt = async (ctx: any) => {
       isWin: data.is_secret_discovered,
     });
 
-    const userUpdated = await setCachedUser(userId);
-
-    const incrementResult = await incrementPoolPrize();
+    const [userUpdated, incrementResult] = await Promise.all([
+      setCachedUser(userId),
+      incrementPoolPrize(),
+    ]);
 
     if (incrementResult.success && incrementResult.data) {
       await updateCachedPrizePool({

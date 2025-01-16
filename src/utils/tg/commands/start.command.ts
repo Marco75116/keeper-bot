@@ -116,9 +116,10 @@ export const botStart = () => {
         return;
       }
 
-      await setCachedUser(userId);
-      const chatIdKey = getChatId(ctx.chat.id);
-      const messageId = await redisClient.get(chatIdKey);
+      const [_, messageId] = await Promise.all([
+        setCachedUser(userId),
+        redisClient.get(getChatId(ctx.chat.id)),
+      ]);
 
       await handleMessage(
         ctx,
@@ -488,9 +489,9 @@ export const botStart = () => {
         getBuyStarsKeyConfimationBoard(link, amountStarsPrice)
       );
     } else if (buytokenObject.network === SOL_TAG) {
-      const solAmount = await getPriceInCrypto(buytokenObject);
-      const pk = await getPrivateSolKeyByTelegramId(userId);
-      const [tonWallet, solanaWallet] = await Promise.all([
+      const [solAmount, pk, tonWallet, solanaWallet] = await Promise.all([
+        getPriceInCrypto(buytokenObject),
+        getPrivateSolKeyByTelegramId(userId),
         getTonWalletAddress(userId),
         getSolWalletPublicKey(userId),
       ]);
@@ -551,12 +552,13 @@ export const botStart = () => {
         handleMessage(ctx, paymentFailMessage, getPaymentSuccessKeyBoard());
       }
     } else if (buytokenObject.network === TON_TAG) {
-      const tonAmount = await getPriceInCrypto(buytokenObject);
-      const walletKeys = await getTonKeysByTelegramId(userId);
-      const [tonWallet, solanaWallet] = await Promise.all([
-        getTonWalletAddress(userId),
-        getSolWalletPublicKey(userId),
-      ]);
+      const [tonAmount, walletKeys, tonWallet, solanaWallet] =
+        await Promise.all([
+          getPriceInCrypto(buytokenObject),
+          getTonKeysByTelegramId(userId),
+          getTonWalletAddress(userId),
+          getSolWalletPublicKey(userId),
+        ]);
 
       const cachedBalances = await getBalancesFromCache(
         tonWallet,
