@@ -56,3 +56,8 @@ export type TonPriceResult = {
   price?: number;
   error?: string;
 };
+
+export type CachedBalances = {
+  ton: number;
+  sol: number;
+};

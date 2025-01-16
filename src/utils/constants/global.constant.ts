@@ -33,3 +33,6 @@ export const TON_PRICE_CACHE_EXPIRY = 300;
 export const TON_PRICE_CACHE_KEY = "TON:PRICE";
 
 export const TICKET_PRICE_USD = 0.8;
+
+export const BALANCES_CACHE_KEY = "USER:BALANCES";
+export const BALANCES_CACHE_EXPIRY = 300;
