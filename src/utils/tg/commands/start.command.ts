@@ -79,7 +79,10 @@ import {
   getSolPriceFromCache,
   sendSol,
 } from "../../helpers/solana.helper";
-import { incrementTickets } from "../../helpers/bddqueries/insert.queries.helper";
+import {
+  incrementTickets,
+  insertTicketPurchase,
+} from "../../helpers/bddqueries/insert.queries.helper";
 import {
   getBalancesFromCache,
   setCachedBalances,
@@ -593,6 +596,14 @@ export const botStart = () => {
           userId,
           Number(buytokenObject.amount)
         );
+
+        insertTicketPurchase({
+          telegramId: userId,
+          amountTickets: Number(buytokenObject.amount),
+          network: TON_TAG,
+          priceInCrypto: Number(tonAmount),
+          txHash: resultTonPayment.hash,
+        });
 
         setCachedBalances(tonWallet, solanaWallet);
         setCachedUser(userId);

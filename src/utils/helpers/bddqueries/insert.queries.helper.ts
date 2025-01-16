@@ -1,5 +1,10 @@
 import { eq, isNull, sql } from "drizzle-orm";
-import { attempts, poolPrize, user } from "../../../db/schema";
+import {
+  attempts,
+  poolPrize,
+  ticketPurchasesViaBot,
+  user,
+} from "../../../db/schema";
 import { db } from "../../clients/drizzle.client";
 import type { CreateAttemptParams } from "../../types/global.type";
 
@@ -138,3 +143,56 @@ export const incrementTickets = async (
     };
   }
 };
+type InsertTicketPurchaseParams = {
+  telegramId: number;
+  amountTickets: number;
+  network: "TON" | "SOL" | "XTR";
+  priceInCrypto: number;
+  txHash?: string;
+};
+
+export async function insertTicketPurchase({
+  telegramId,
+  amountTickets,
+  network,
+  priceInCrypto,
+  txHash,
+}: InsertTicketPurchaseParams): Promise<{
+  success: boolean;
+  error?: string;
+}> {
+  try {
+    const userResult = await db
+      .select({
+        id: user.id,
+      })
+      .from(user)
+      .where(eq(user.telegramId, telegramId))
+      .limit(1);
+
+    if (!userResult.length) {
+      return {
+        success: false,
+        error: "User not found",
+      };
+    }
+
+    await db.insert(ticketPurchasesViaBot).values({
+      userId: userResult[0].id,
+      amountTickets: amountTickets,
+      network: network,
+      priceInCrypto: priceInCrypto.toString(),
+      txHash: txHash,
+    });
+
+    return {
+      success: true,
+    };
+  } catch (error) {
+    console.error("Error inserting ticket purchase:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error occurred",
+    };
+  }
+}
