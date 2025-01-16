@@ -70,14 +70,12 @@ import {
 } from "../../constants/global.constant";
 import type { BuyConstructor } from "../../types/global.type";
 import {
-  getTONBalance,
   getTonKeysByTelegramId,
   getTonPriceFromCache,
   sendTon,
 } from "../../helpers/ton.helper";
 import {
   getPrivateSolKeyByTelegramId,
-  getSOLBalance,
   getSolPriceFromCache,
   sendSol,
 } from "../../helpers/solana.helper";
@@ -363,7 +361,7 @@ export const botStart = () => {
 
   bot.action(BUY_ACTIONS.TON, async (ctx) => {
     await ctx.answerCbQuery();
-    const buyObject = await handleSetNetworkBuyAction(ctx.from.id, "TON");
+    const buyObject = await handleSetNetworkBuyAction(ctx.from.id, TON_TAG);
     const totalPriceInCrypto = await getPriceInCrypto(buyObject);
     handleMessage(
       ctx,
@@ -374,7 +372,7 @@ export const botStart = () => {
 
   bot.action(BUY_ACTIONS.SOLANA, async (ctx) => {
     await ctx.answerCbQuery();
-    const buyObject = await handleSetNetworkBuyAction(ctx.from.id, "SOL");
+    const buyObject = await handleSetNetworkBuyAction(ctx.from.id, SOL_TAG);
     const totalPriceInCrypto = await getPriceInCrypto(buyObject);
     handleMessage(
       ctx,

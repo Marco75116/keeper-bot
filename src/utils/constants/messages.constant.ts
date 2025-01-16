@@ -5,7 +5,7 @@ import type {
   NetworkType,
   PoolPrize,
 } from "../types/global.type";
-import { TICKET_PRICE_IN_STARS } from "./global.constant";
+import { SOL_TAG, TICKET_PRICE_IN_STARS, TON_TAG } from "./global.constant";
 
 export const WELCOME_MESSAGE = `Welcome to Yum Party! 🍭
 The taps are over—now it's all about skills! 💥
@@ -156,11 +156,11 @@ export const getWalletsMessage = (
   
 🔑 <b>Address:</b>
 <code>${tonWallet}</code>
-• 🌿 ${tonLink} : ${tonBalance.toFixed(3)} TON  
+• 🌿 ${tonLink} : ${tonBalance.toFixed(3)} ${TON_TAG}  
 
 🔑 <b>Address:</b>
 <code>${solWallet}</code>
-• 🌉 ${solLink} : ${solanaBalance.toFixed(3)} SOL  
+• 🌉 ${solLink} : ${solanaBalance.toFixed(3)} ${SOL_TAG}  
   
 `;
 
@@ -187,10 +187,10 @@ export const getBuyCryptoMessage = (
   msg += `🌐 <b>Network:</b> ${buyObject.network?.trim() || "..."}\n`;
   msg += `🎟️ <b>Tickets:</b> ${buyObject.amount?.trim() || "..."}\n`;
   msg += `💰 <b>Total:</b> ${priceInCrypto.toFixed(4) || "..."} ${
-    buyObject.network === "TON"
-      ? "TON"
-      : buyObject.network === "SOL"
-      ? "SOL"
+    buyObject.network === TON_TAG
+      ? TON_TAG
+      : buyObject.network === SOL_TAG
+      ? SOL_TAG
       : ""
   }\n\n`;
   msg += `Please review the purchase details carefully. Once confirmed, the transfer will be initiated. 🔐`;
@@ -204,7 +204,7 @@ export const paymentOptionsMessage = `🎟️ <b>Choose Your Payment Method</b>
 Pay directly with Telegram Stars - quick and easy!
 
 🪙 <b>Cryptocurrency</b>
-Pay with TON or SOL.
+Pay with ${TON_TAG} or ${SOL_TAG}.
 
 Select your preferred payment method below 👇`;
 

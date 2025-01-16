@@ -33,8 +33,10 @@ import {
 } from "../tg/keyboards/global.keyboards";
 import {
   buyConstructorEmpty,
+  SOL_TAG,
   TICKET_PRICE_IN_STARS,
   TICKET_PRICE_USD,
+  TON_TAG,
   URL_KEEPER,
 } from "../constants/global.constant";
 import { buy_PREFIX } from "../tg/actions/global.actions";
@@ -385,13 +387,13 @@ export async function getPriceInCrypto(
     const totalUsdCost = numTickets * TICKET_PRICE_USD;
 
     switch (buyObject.network) {
-      case "SOL": {
+      case SOL_TAG: {
         const solPrice = await getSolPriceFromCache();
         if (!solPrice) return 0;
         return totalUsdCost / solPrice;
       }
 
-      case "TON": {
+      case TON_TAG: {
         const tonPrice = await getTonPriceFromCache();
         if (!tonPrice) return 0;
         return totalUsdCost / tonPrice;
