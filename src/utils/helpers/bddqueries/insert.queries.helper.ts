@@ -6,7 +6,10 @@ import {
   user,
 } from "../../../db/schema";
 import { db } from "../../clients/drizzle.client";
-import type { CreateAttemptParams } from "../../types/global.type";
+import type {
+  CreateAttemptParams,
+  InsertTicketPurchaseParams,
+} from "../../types/global.type";
 
 export const insertAttempt = async (params: CreateAttemptParams) => {
   return await db
@@ -143,19 +146,12 @@ export const incrementTickets = async (
     };
   }
 };
-type InsertTicketPurchaseParams = {
-  telegramId: number;
-  amountTickets: number;
-  network: "TON" | "SOL" | "XTR";
-  priceInCrypto: number;
-  txHash?: string;
-};
 
 export async function insertTicketPurchase({
   telegramId,
   amountTickets,
   network,
-  priceInCrypto,
+  price,
   txHash,
 }: InsertTicketPurchaseParams): Promise<{
   success: boolean;
@@ -181,7 +177,7 @@ export async function insertTicketPurchase({
       userId: userResult[0].id,
       amountTickets: amountTickets,
       network: network,
-      priceInCrypto: priceInCrypto.toString(),
+      price: price.toString(),
       txHash: txHash,
     });
 

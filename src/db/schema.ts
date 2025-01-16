@@ -738,7 +738,7 @@ export const ticketPurchasesViaBot = pgTable(
     userId: uuid("user_id").notNull(),
     amountTickets: integer("amount_tickets").notNull(),
     network: text("network").notNull(),
-    priceInCrypto: decimal("price_in_crypto", {
+    price: decimal("price", {
       precision: 18,
       scale: 9,
     }).notNull(),

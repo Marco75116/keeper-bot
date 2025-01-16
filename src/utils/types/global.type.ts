@@ -62,3 +62,11 @@ export type CachedBalances = {
   ton: number;
   sol: number;
 };
+
+export type InsertTicketPurchaseParams = {
+  telegramId: number;
+  amountTickets: number;
+  network: "TON" | "SOL" | "XTR";
+  price: number;
+  txHash?: string;
+};

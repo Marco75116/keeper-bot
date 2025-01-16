@@ -118,7 +118,7 @@ export const botStart = () => {
         telegramId: userId,
         amountTickets: numberTicketsBought,
         network: XTR_TAG,
-        priceInCrypto: payment.total_amount,
+        price: payment.total_amount,
         txHash: payment.telegram_payment_charge_id,
       });
 
@@ -545,7 +545,7 @@ export const botStart = () => {
           telegramId: userId,
           amountTickets: Number(buytokenObject.amount),
           network: SOL_TAG,
-          priceInCrypto: Number(solAmount),
+          price: Number(solAmount),
           txHash: resultSolPayment.signature,
         });
 
@@ -617,7 +617,7 @@ export const botStart = () => {
           telegramId: userId,
           amountTickets: Number(buytokenObject.amount),
           network: TON_TAG,
-          priceInCrypto: Number(tonAmount),
+          price: Number(tonAmount),
           txHash: resultTonPayment.hash,
         });
 
