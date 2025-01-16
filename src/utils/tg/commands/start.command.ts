@@ -18,6 +18,7 @@ import {
   getTONPaymentSuccessMessage,
   paymentFailMessage,
   loadingStatesBalance,
+  getInsufficientTonBalanceMessage,
 } from "../../constants/messages.constant";
 import {
   getAttemptKeyBoard,
@@ -533,9 +534,27 @@ export const botStart = () => {
     } else if (buytokenObject.network === "TON") {
       const tonAmount = await getPriceInCrypto(buytokenObject);
       const walletKeys = await getTonKeysByTelegramId(userId);
+      const [tonWallet, solanaWallet] = await Promise.all([
+        getTonWalletAddress(userId),
+        getSolWalletPublicKey(userId),
+      ]);
+
+      const cachedBalances = await getBalancesFromCache(
+        tonWallet,
+        solanaWallet
+      );
 
       if (!walletKeys.privateKey || !walletKeys.publicKey) {
         console.error("TON payment error while retrieving wallet keys");
+        return;
+      }
+
+      if (cachedBalances && cachedBalances?.ton < tonAmount) {
+        handleMessage(
+          ctx,
+          getInsufficientTonBalanceMessage(cachedBalances.ton, tonAmount),
+          getPaymentSuccessKeyBoard()
+        );
         return;
       }
 
@@ -560,6 +579,7 @@ export const botStart = () => {
           Number(buytokenObject.amount)
         );
 
+        await setCachedBalances(tonWallet, solanaWallet);
         setCachedUser(userId);
 
         if (!ticketsResponse.success || ticketsResponse.tickets === undefined) {

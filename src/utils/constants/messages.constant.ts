@@ -151,11 +151,11 @@ export const getWalletsMessage = (
   
 🔑 <b>Address:</b>
 <code>${tonWallet}</code>
-• 🌿 ${tonLink} : ${tonBalance.toFixed(2)} TON  
+• 🌿 ${tonLink} : ${tonBalance.toFixed(3)} TON  
 
 🔑 <b>Address:</b>
 <code>${solWallet}</code>
-• 🌉 ${solLink} : ${solanaBalance.toFixed(2)} SOL  
+• 🌉 ${solLink} : ${solanaBalance.toFixed(3)} SOL  
   
 `;
 
@@ -263,3 +263,16 @@ export const paymentFailMessage = `❌ <b>Payment Failed</b>
 Sorry, your payment could not be completed.
 
 Please try again or contact support if the issue persists.`;
+
+export const getInsufficientTonBalanceMessage = (
+  balance: number,
+  requiredAmount: number
+): string => {
+  return `❌ <b>Insufficient Balance</b>
+ 
+Your TON wallet balance: ${balance.toFixed(4)} TON
+Required amount: ${requiredAmount.toFixed(4)} TON
+Missing: ${(requiredAmount - balance).toFixed(4)} TON
+ 
+Please top up your wallet, reload you wallet data and try again.`;
+};
