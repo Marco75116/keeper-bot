@@ -18,6 +18,7 @@ import {
   jsonb,
   primaryKey,
   pgMaterializedView,
+  decimal,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 
@@ -725,4 +726,44 @@ export const userRanking = pgMaterializedView("user_ranking", {
   leagueRank: integer("league_rank"),
 }).as(
   sql`WITH ranked_users AS ( SELECT "user".id, "user".elo, row_number() OVER (ORDER BY "user".elo DESC)::integer AS global_rank, (row_number() OVER (ORDER BY "user".elo DESC)::numeric * 100.0 / count(*) OVER ()::numeric)::double precision AS global_rank_percentile FROM "user" ), league_assignment AS ( SELECT r.id AS user_id, r.elo, r.global_rank, r.global_rank_percentile, ( SELECT l.id FROM league l WHERE r.elo >= l.elo_min AND r.global_rank_percentile <= l.top_percent_required::double precision ORDER BY l.id DESC LIMIT 1) AS league_id FROM ranked_users r ), league_ranked_users AS ( SELECT la.user_id, la.elo, la.global_rank, la.global_rank_percentile, la.league_id, row_number() OVER (PARTITION BY la.league_id ORDER BY la.elo DESC)::integer AS league_rank FROM league_assignment la ) SELECT user_id, elo, global_rank, global_rank_percentile, league_id, league_rank FROM league_ranked_users`
+);
+
+export const ticketPurchasesViaBot = pgTable(
+  "ticket_purchases_via_bot",
+  {
+    id: uuid()
+      .default(sql`uuid_generate_v4()`)
+      .primaryKey()
+      .notNull(),
+    userId: uuid("user_id").notNull(),
+    amountTickets: integer("amount_tickets").notNull(),
+    network: text("network").notNull(),
+    priceInCrypto: decimal("price_in_crypto", {
+      precision: 18,
+      scale: 9,
+    }).notNull(),
+    txHash: varchar("tx_hash", { length: 255 }),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+  },
+  (table) => [
+    index("ticket_purchases_via_bot_userid_index").using(
+      "btree",
+      table.userId.asc().nullsLast().op("uuid_ops")
+    ),
+    index("ticket_purchases_via_bot_txhash_index").using(
+      "btree",
+      table.txHash.asc().nullsLast().op("text_ops")
+    ),
+    foreignKey({
+      columns: [table.userId],
+      foreignColumns: [user.id],
+      name: "ticket_purchases_via_bot_userid_foreign",
+    }).onDelete("cascade"),
+    check(
+      "ticket_purchases_via_bot_network_check",
+      sql`network = ANY (ARRAY['TON'::text, 'SOL'::text, 'XTR'::text])`
+    ),
+  ]
 );
