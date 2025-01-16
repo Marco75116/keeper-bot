@@ -36,3 +36,9 @@ export const TICKET_PRICE_USD = 0.8;
 
 export const BALANCES_CACHE_KEY = "USER:BALANCES";
 export const BALANCES_CACHE_EXPIRY = 300;
+
+export const TON_TAG = "TON";
+export const SOL_TAG = "SOL";
+export const XTR_TAG = "XTR";
+
+export const NETWORKS_TAG = [TON_TAG, XTR_TAG, SOL_TAG, ""] as const;

@@ -1,4 +1,5 @@
 import { attempts, poolPrize, user } from "../../db/schema";
+import type { NETWORKS_TAG } from "../constants/global.constant";
 
 export type User = typeof user.$inferSelect;
 export type Attempts = typeof attempts.$inferSelect;
@@ -21,7 +22,7 @@ export interface CreateAttemptParams {
   isWin: boolean;
 }
 
-export type NetworkType = "TON" | "SOL" | "XTR" | "";
+export type NetworkType = (typeof NETWORKS_TAG)[number];
 
 export interface BuyConstructor {
   network: NetworkType;

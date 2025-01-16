@@ -1,5 +1,10 @@
 import { getLink } from "../helpers/global.helper";
-import type { Attempts, BuyConstructor, PoolPrize } from "../types/global.type";
+import type {
+  Attempts,
+  BuyConstructor,
+  NetworkType,
+  PoolPrize,
+} from "../types/global.type";
 import { TICKET_PRICE_IN_STARS } from "./global.constant";
 
 export const WELCOME_MESSAGE = `Welcome to Yum Party! 🍭
@@ -264,15 +269,16 @@ Sorry, your payment could not be completed.
 
 Please try again or contact support if the issue persists.`;
 
-export const getInsufficientTonBalanceMessage = (
+export const getInsufficientBalanceMessage = (
   balance: number,
-  requiredAmount: number
+  requiredAmount: number,
+  network: NetworkType
 ): string => {
   return `❌ <b>Insufficient Balance</b>
  
-Your TON wallet balance: ${balance.toFixed(4)} TON
-Required amount: ${requiredAmount.toFixed(4)} TON
-Missing: ${(requiredAmount - balance).toFixed(4)} TON
+Your ${network} wallet balance: ${balance.toFixed(4)} ${network}
+Required amount: ${requiredAmount.toFixed(4)} ${network}
+Missing: ${(requiredAmount - balance).toFixed(4)} ${network}
  
-Please top up your wallet, reload you wallet data and try again.`;
+Please top up your wallet, reload your wallet data and try again.`;
 };
