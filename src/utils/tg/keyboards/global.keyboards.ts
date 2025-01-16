@@ -123,12 +123,6 @@ export const getBuyCryptoKeyboard = () => {
 export const getBuyStarsKeyboard = () => {
   return Markup.inlineKeyboard([
     [
-      Markup.button.callback(
-        "🔢 SELECT AN AMOUNT 🔢",
-        BUY_ACTIONS.SELECTANAMOUNT
-      ),
-    ],
-    [
       Markup.button.callback("1", BUY_ACTIONS.ONE),
       Markup.button.callback("5", BUY_ACTIONS.FIVE),
       Markup.button.callback("✏️ Custom", BUY_ACTIONS.AMOUNT),
@@ -155,6 +149,15 @@ export const getBuyStarsKeyConfimationBoard = (
 
 export const getPaymentSuccessKeyBoard = () => {
   return Markup.inlineKeyboard([
+    [
+      Markup.button.callback("⬅️ Back", KEEPER_HOME_ACTIONS.HOME),
+      Markup.button.callback("✕ Close", KEEPER_HOME_ACTIONS.CLOSE),
+    ],
+  ]);
+};
+export const getInsufficientBalanceKeyBoard = () => {
+  return Markup.inlineKeyboard([
+    [Markup.button.callback("⭐️ Pay with Stars", BUY_ACTIONS.SEND_STARS)],
     [
       Markup.button.callback("⬅️ Back", KEEPER_HOME_ACTIONS.HOME),
       Markup.button.callback("✕ Close", KEEPER_HOME_ACTIONS.CLOSE),

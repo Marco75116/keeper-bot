@@ -174,7 +174,8 @@ export const getBuyStarsMessage = (amount: string) => {
   msg += `1 🎟️ = ${TICKET_PRICE_IN_STARS} ⭐️\n\n`;
   msg += `🎟️ <b>Tickets:</b> ${amount?.trim() || "..."}\n`;
   msg += `✨ <b>Total:</b> ${totalStars} \n\n`;
-  msg += `Ready to shine? Click confirmation to proceed with your purchase with stars! 🌟`;
+  msg += `Ready to shine? Click confirmation to proceed with your purchase with stars! 🌟\n\n`;
+  msg += `Select the amount of tickets below 👇`;
 
   return msg;
 };
@@ -273,15 +274,35 @@ Please try again or contact support if the issue persists.`;
 export const getInsufficientBalanceMessage = (
   balance: number,
   requiredAmount: number,
-  network: NetworkType
+  network: NetworkType,
+  walletAddress: string
 ): string => {
+  const shortenedAddress = `${walletAddress.slice(
+    0,
+    4
+  )}...${walletAddress.slice(-6)}`;
+
+  const explorerLink =
+    network === "TON"
+      ? getLink(
+          shortenedAddress,
+          `https://tonscan.org/address/${walletAddress}`
+        )
+      : network === "SOL"
+      ? getLink(shortenedAddress, `https://solscan.io/account/${walletAddress}`)
+      : "";
+
   return `❌ <b>Insufficient Balance</b>
  
-Your ${network} wallet balance: ${balance.toFixed(4)} ${network}
-Required amount: ${requiredAmount.toFixed(4)} ${network}
-Missing: ${(requiredAmount - balance).toFixed(4)} ${network}
+ Your ${network} wallet balance: ${balance.toFixed(4)} ${network}
+ Required amount: ${requiredAmount.toFixed(4)} ${network}
+ Missing: ${(requiredAmount - balance).toFixed(4)} ${network}
  
-Please top up your wallet, reload your wallet data and try again.`;
+ 💼 Your wallet: ${explorerLink} 🔎
+ 
+ Please top up your wallet, and try again.
+ 
+ Or pay by card 💳 using stars payment ⭐️`;
 };
 
 export const chooseNetworkPayment = `🎮 Select Your Payment Network

@@ -29,6 +29,7 @@ import {
   getBuyStarsKeyConfimationBoard,
   getChallengeKeyBoard,
   getEmptyKeyBoard,
+  getInsufficientBalanceKeyBoard,
   getKeeperHomeKeyboard,
   getPaymentOptionsKeyboard,
   getPaymentSuccessKeyBoard,
@@ -514,8 +515,13 @@ export const botStart = () => {
       if (cachedBalances && cachedBalances?.sol < solAmount) {
         handleMessage(
           ctx,
-          getInsufficientBalanceMessage(cachedBalances.sol, solAmount, SOL_TAG),
-          getPaymentSuccessKeyBoard()
+          getInsufficientBalanceMessage(
+            cachedBalances.sol,
+            solAmount,
+            SOL_TAG,
+            solanaWallet
+          ),
+          getInsufficientBalanceKeyBoard()
         );
         return;
       }
@@ -585,8 +591,13 @@ export const botStart = () => {
       if (cachedBalances && cachedBalances?.ton < tonAmount) {
         handleMessage(
           ctx,
-          getInsufficientBalanceMessage(cachedBalances.ton, tonAmount, TON_TAG),
-          getPaymentSuccessKeyBoard()
+          getInsufficientBalanceMessage(
+            cachedBalances.ton,
+            tonAmount,
+            TON_TAG,
+            tonWallet
+          ),
+          getInsufficientBalanceKeyBoard()
         );
         return;
       }
