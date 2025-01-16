@@ -251,3 +251,9 @@ export const loadingStatesTx = [
   "🔄 Confirming on network...",
   "⚡ Waiting for confirmation...",
 ];
+
+export const paymentFailMessage = `❌ <b>Payment Failed</b>
+
+Sorry, your payment could not be completed.
+
+Please try again or contact support if the issue persists.`;

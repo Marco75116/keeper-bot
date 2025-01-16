@@ -179,6 +179,7 @@ async function waitForTransactionComplete(
 ): Promise<string | null> {
   let attempts = 0;
   const maxAttempts = 15;
+  await sleep(3000);
 
   while (attempts < maxAttempts) {
     await sleep(2000);

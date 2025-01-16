@@ -16,6 +16,7 @@ import {
   getSolPaymentSuccessMessage,
   loadingStatesTx,
   getTONPaymentSuccessMessage,
+  paymentFailMessage,
 } from "../../constants/messages.constant";
 import {
   getAttemptKeyBoard,
@@ -471,6 +472,8 @@ export const botStart = () => {
           ),
           getPaymentSuccessKeyBoard()
         );
+      } else {
+        handleMessage(ctx, paymentFailMessage, getPaymentSuccessKeyBoard());
       }
     } else if (buytokenObject.network === "TON") {
       const tonAmount = await getPriceInCrypto(buytokenObject);
@@ -517,6 +520,8 @@ export const botStart = () => {
           ),
           getPaymentSuccessKeyBoard()
         );
+      } else {
+        handleMessage(ctx, paymentFailMessage, getPaymentSuccessKeyBoard());
       }
     }
   });
