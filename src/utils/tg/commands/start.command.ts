@@ -17,6 +17,7 @@ import {
   loadingStatesTx,
   getTONPaymentSuccessMessage,
   paymentFailMessage,
+  loadingStatesBalance,
 } from "../../constants/messages.constant";
 import {
   getAttemptKeyBoard,
@@ -28,6 +29,7 @@ import {
   getKeeperHomeKeyboard,
   getPaymentOptionsKeyboard,
   getPaymentSuccessKeyBoard,
+  getWalletKeyBoard,
   getWelcomeKeyboard,
 } from "../keyboards/global.keyboards";
 import {
@@ -76,7 +78,10 @@ import {
   sendSol,
 } from "../../helpers/solana.helper";
 import { incrementTickets } from "../../helpers/bddqueries/insert.queries.helper";
-import { getBalancesFromCache } from "../../helpers/redis.helper";
+import {
+  getBalancesFromCache,
+  setCachedBalances,
+} from "../../helpers/redis.helper";
 
 export const botStart = () => {
   bot.on("pre_checkout_query", async (ctx) => {
@@ -275,7 +280,58 @@ export const botStart = () => {
         balances.sol,
         totalValue
       ),
-      getKeeperHomeKeyboard()
+      getWalletKeyBoard()
+    );
+  });
+
+  bot.action(KEEPER_HOME_ACTIONS.RELOAD, async (ctx) => {
+    await ctx.answerCbQuery();
+    const userId = ctx.from.id;
+    const { loadingPromise, stopLoading } = await startLoading(
+      userId,
+      String(ctx.update.callback_query.message?.message_id),
+      loadingStatesBalance
+    );
+    const [tonWallet, solanaWallet] = await Promise.all([
+      getTonWalletAddress(userId),
+      getSolWalletPublicKey(userId),
+    ]);
+    await setCachedBalances(tonWallet, solanaWallet);
+
+    const [cachedBalances, tonPrice, solPrice] = await Promise.all([
+      getBalancesFromCache(tonWallet, solanaWallet).catch((error) => {
+        console.error("Balance fetch error:", error);
+        return { ton: 0, sol: 0 };
+      }),
+      getTonPriceFromCache().catch((error) => {
+        console.error("TON price fetch error:", error);
+        return null;
+      }),
+      getSolPriceFromCache().catch((error) => {
+        console.error("SOL price fetch error:", error);
+        return null;
+      }),
+    ]);
+
+    const balances = cachedBalances ?? { ton: 0, sol: 0 };
+
+    const tonValue = tonPrice ? balances.ton * tonPrice : 0;
+    const solValue = solPrice ? balances.sol * solPrice : 0;
+    const totalValue = tonValue + solValue;
+
+    stopLoading();
+    await loadingPromise;
+
+    await handleMessage(
+      ctx,
+      getWalletsMessage(
+        tonWallet,
+        solanaWallet,
+        balances.ton,
+        balances.sol,
+        totalValue
+      ),
+      getWalletKeyBoard()
     );
   });
 

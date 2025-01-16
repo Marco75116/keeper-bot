@@ -252,6 +252,12 @@ export const loadingStatesTx = [
   "⚡ Waiting for confirmation...",
 ];
 
+export const loadingStatesBalance = [
+  "💰 Fetching balances...",
+  "📊 Updating wallet info...",
+  "⚡ Syncing with blockchain...",
+];
+
 export const paymentFailMessage = `❌ <b>Payment Failed</b>
 
 Sorry, your payment could not be completed.

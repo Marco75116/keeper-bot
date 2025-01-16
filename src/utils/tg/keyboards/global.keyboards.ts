@@ -70,6 +70,15 @@ export const getAttemptKeyBoard = () => {
     ],
   ]);
 };
+export const getWalletKeyBoard = () => {
+  return Markup.inlineKeyboard([
+    [Markup.button.callback("🔄 Reload", KEEPER_HOME_ACTIONS.RELOAD)],
+    [
+      Markup.button.callback("⬅️ Back", KEEPER_HOME_ACTIONS.HOME),
+      Markup.button.callback("✕ Close", KEEPER_HOME_ACTIONS.CLOSE),
+    ],
+  ]);
+};
 
 export const getPaymentOptionsKeyboard = () => {
   return Markup.inlineKeyboard([

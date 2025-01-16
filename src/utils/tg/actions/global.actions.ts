@@ -13,6 +13,7 @@ export const KEEPER_HOME_ACTIONS = {
   ATTEMPT: "attempt",
   WALLET: "wallet",
   BUY: "buy",
+  RELOAD: "reload",
 };
 
 export const buy_PREFIX = "buy";
