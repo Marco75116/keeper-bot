@@ -38,6 +38,7 @@ import {
 } from "../keyboards/global.keyboards";
 import {
   createInvoiceLink,
+  createUser,
   getPriceInCrypto,
   handleAttempt,
   handleBuyCustom,
@@ -168,6 +169,9 @@ export const botStart = () => {
     }
 
     const user = await getUser(userId);
+    if (!user) {
+      createUser(ctx.from);
+    }
     const message = await ctx.reply(
       WELCOME_MESSAGE,
       getWelcomeKeyboard(!!user)

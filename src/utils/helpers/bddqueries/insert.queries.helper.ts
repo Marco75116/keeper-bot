@@ -4,12 +4,16 @@ import {
   poolPrize,
   ticketPurchasesViaBot,
   user,
+  wallets,
 } from "../../../db/schema";
 import { db } from "../../clients/drizzle.client";
 import type {
   CreateAttemptParams,
+  CreateUserParams,
+  EncryptedData,
   InsertTicketPurchaseParams,
 } from "../../types/global.type";
+import { v4 as uuidv4 } from "uuid";
 
 export const insertAttempt = async (params: CreateAttemptParams) => {
   return await db
@@ -192,3 +196,34 @@ export async function insertTicketPurchase({
     };
   }
 }
+
+export const insertUser = async (params: CreateUserParams) => {
+  return await db
+    .insert(user)
+    .values({
+      id: uuidv4(),
+      telegramId: params.idtg,
+      username: params.tgusername || "player",
+      firstName: params.firstname,
+      lastName: params.lastName || "",
+      languageCode: params.languageCode || "en",
+      yumbarTickets: params.tickets,
+    })
+    .returning();
+};
+
+export const insertWallet = async (params: {
+  idtg: number;
+  wallet: string;
+  encryptedData: EncryptedData;
+}) => {
+  return await db
+    .insert(wallets)
+    .values({
+      telegramId: params.idtg,
+      wallet: params.wallet,
+      iv: params.encryptedData.iv,
+      encryptedPrivateKey: params.encryptedData.encryptedData,
+    })
+    .returning();
+};

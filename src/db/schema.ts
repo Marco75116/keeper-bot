@@ -12,8 +12,6 @@ import {
   boolean,
   numeric,
   bigint,
-  check,
-  decimal,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 
@@ -75,58 +73,46 @@ export const cashierWalletSol = pgTable(
 export const user = pgTable(
   "user",
   {
-    id: uuid()
-      .default(sql`uuid_generate_v4()`)
-      .primaryKey()
-      .notNull(),
-    // You can use { mode: "bigint" } if numbers are exceeding js number limitations
+    id: uuid().primaryKey().notNull(),
     telegramId: bigint("telegram_id", { mode: "number" }).notNull(),
     username: varchar({ length: 50 }).default("player").notNull(),
     firstName: varchar("first_name", { length: 50 }).notNull(),
     lastName: varchar("last_name", { length: 50 }).notNull(),
     languageCode: varchar("language_code", { length: 255 }).notNull(),
-    teamId: integer("team_id"),
-    // You can use { mode: "bigint" } if numbers are exceeding js number limitations
-    coinBalance: bigint("coin_balance", { mode: "number" })
-      .default(sql`'0'`)
-      .notNull(),
-    yumBucks: integer("yum_bucks").default(0).notNull(),
-    elo: integer().default(0).notNull(),
     createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
-    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" })
-      .default(sql`CURRENT_TIMESTAMP`)
-      .notNull(),
     yumbarTickets: integer("yumbar_tickets").default(0).notNull(),
-    lastYumbarEarnAt: timestamp("last_yumbar_earn_at", {
-      mode: "string",
-    }).default(sql`CURRENT_TIMESTAMP`),
-    referralId: varchar("referral_id", { length: 10 }).notNull(),
-    eloMax: integer("elo_max").default(0).notNull(),
-    leagueIdMax: integer("league_id_max"),
-    telegramPremium: boolean("telegram_premium").default(false).notNull(),
   },
   (table) => [
-    index("idx_user_elo").using(
-      "btree",
-      table.elo.desc().nullsFirst().op("int4_ops")
-    ),
-    index("idx_user_ranking_elo").using(
-      "btree",
-      table.elo.desc().nullsFirst().op("int4_ops")
-    ),
-    index().using("btree", table.elo.asc().nullsLast().op("int4_ops")),
-    index("user_referralid_index").using(
-      "btree",
-      table.referralId.asc().nullsLast().op("text_ops")
-    ),
     index("user_telegramid_index").using(
       "btree",
       table.telegramId.asc().nullsLast().op("int8_ops")
     ),
     unique("user_telegramid_unique").on(table.telegramId),
-    unique("user_referralid_unique").on(table.referralId),
+  ]
+);
+
+export const wallets = pgTable(
+  "wallets",
+  {
+    id: serial("id").primaryKey(),
+    telegramId: bigint("telegram_id", { mode: "number" })
+      .notNull()
+      .references(() => user.telegramId),
+    wallet: text("wallet").notNull(),
+    iv: text("iv").notNull(),
+    encryptedPrivateKey: text("encrypted_private_key").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+  },
+  (table) => [
+    unique("wallets_telegramid_unique").on(table.telegramId),
+    index("wallets_telegramid_index").using(
+      "btree",
+      table.telegramId.asc().nullsLast().op("int8_ops")
+    ),
   ]
 );
 
@@ -171,18 +157,14 @@ export const cashierWalletTon = pgTable(
 export const ticketPurchasesViaBot = pgTable(
   "ticket_purchases_via_bot",
   {
-    id: uuid()
-      .default(sql`uuid_generate_v4()`)
-      .primaryKey()
-      .notNull(),
-    userId: uuid("user_id").notNull(),
+    id: uuid().primaryKey().notNull(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => user.id),
     amountTickets: integer("amount_tickets").notNull(),
-    network: text("network").notNull(),
-    price: decimal("price", {
-      precision: 18,
-      scale: 9,
-    }).notNull(),
-    txHash: varchar("tx_hash", { length: 255 }),
+    network: varchar("network", { length: 50 }).notNull(),
+    price: varchar("price", { length: 255 }).notNull(),
+    txHash: varchar("tx_hash", { length: 255 }).notNull(),
     createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
@@ -191,19 +173,6 @@ export const ticketPurchasesViaBot = pgTable(
     index("ticket_purchases_via_bot_userid_index").using(
       "btree",
       table.userId.asc().nullsLast().op("uuid_ops")
-    ),
-    index("ticket_purchases_via_bot_txhash_index").using(
-      "btree",
-      table.txHash.asc().nullsLast().op("text_ops")
-    ),
-    foreignKey({
-      columns: [table.userId],
-      foreignColumns: [user.id],
-      name: "ticket_purchases_via_bot_userid_foreign",
-    }).onDelete("cascade"),
-    check(
-      "ticket_purchases_via_bot_network_check",
-      sql`network = ANY (ARRAY['TON'::text, 'SOL'::text, 'XTR'::text])`
     ),
   ]
 );

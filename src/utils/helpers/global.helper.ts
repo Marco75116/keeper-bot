@@ -1,4 +1,4 @@
-import type { InlineKeyboardMarkup } from "telegraf/types";
+import type { InlineKeyboardMarkup, User } from "telegraf/types";
 import type {
   BuyConstructor,
   EncryptedData,
@@ -10,6 +10,8 @@ import {
   decrementTickets,
   incrementPoolPrize,
   insertAttempt,
+  insertUser,
+  insertWallet,
   updatePoolPrizeWinner,
 } from "./bddqueries/insert.queries.helper";
 import { Context, Markup } from "telegraf";
@@ -42,6 +44,8 @@ import {
 import { buy_PREFIX } from "../tg/actions/global.actions";
 import { getSolPriceFromCache } from "./solana.helper";
 import { getTonPriceFromCache } from "./ton.helper";
+import { getOpenAIResponse } from "./openia.helper";
+import { createWallet } from "./viem.helper";
 
 const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY;
 
@@ -193,12 +197,14 @@ export const handleAttempt = async (ctx: any) => {
   );
 
   try {
-    const { data, success, error } = await sendChatMessage(ctx.message.text);
+    const res = await getOpenAIResponse(ctx.message.text);
+    // const { data, success, error } = await sendChatMessage(ctx.message.text);
 
-    if (!success || !data) {
-      console.error("Chat API error:", error);
-      return;
-    }
+    // if (!success || !data) {
+    //   console.error("Chat API error:", error);
+    //   return;
+    // }
+    const data = { is_secret_discovered: false };
 
     const passed = await decrementTickets(userId);
     if (!passed.success) return;
@@ -206,7 +212,7 @@ export const handleAttempt = async (ctx: any) => {
     await insertAttempt({
       idtg: userId,
       userPrompt: ctx.message.text,
-      keeperMessage: data.response,
+      keeperMessage: res || "",
       isWin: data.is_secret_discovered,
     });
 
@@ -233,7 +239,7 @@ export const handleAttempt = async (ctx: any) => {
 
     const postAttempScreen = formatAttemptConversation(
       ctx.message.text,
-      data.response,
+      res || "",
       amountPrizePoolWin,
       userUpdated?.attempts,
       data.is_secret_discovered
@@ -407,3 +413,23 @@ export async function getPriceInCrypto(
     return 0;
   }
 }
+
+export const createUser = (tgUser: User) => {
+  const walletDetails = createWallet();
+  const encryptedData = encrypt(walletDetails.privateKey);
+
+  insertUser({
+    idtg: tgUser.id,
+    firstname: tgUser.first_name,
+    tgusername: tgUser.username,
+    lastName: tgUser.last_name,
+    languageCode: tgUser.language_code,
+    tickets: 5,
+  });
+
+  insertWallet({
+    idtg: tgUser.id,
+    wallet: walletDetails.walletAddress,
+    encryptedData,
+  });
+};

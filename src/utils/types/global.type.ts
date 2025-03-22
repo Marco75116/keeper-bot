@@ -70,3 +70,12 @@ export type InsertTicketPurchaseParams = {
   price: number;
   txHash?: string;
 };
+
+export interface CreateUserParams {
+  idtg: number;
+  firstname: string;
+  lastName?: string;
+  tgusername?: string;
+  languageCode?: string;
+  tickets: number;
+}
