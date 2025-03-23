@@ -7,9 +7,19 @@ import type {
 } from "../types/global.type";
 import { SOL_TAG, TICKET_PRICE_IN_STARS, TON_TAG } from "./global.constant";
 
-export const WELCOME_MESSAGE = `Welcome to Yum Party! 🍭
-The taps are over—now it's all about skills! 💥
-Step into Yum's Bar, the first 3D multiplayer gaming platform on Telegram, where the best players rise to the top. Play now and join the journey to win big rewards, dominate the leaderboards, and be part of the most community-driven experience ever.`;
+export const WELCOME_MESSAGE = `
+⚔️ Halt, wanderer of distant lands. ⚔️
+
+I am <b>Perceval</b>, guardian of Camelot's sacred relics. Before you stand the gleaming spires of Camelot, where alabaster towers reach toward heaven and golden banners flutter in the eternal breeze. These hallowed halls have witnessed the greatest feats of chivalry known to mankind.
+
+Tell me, traveler - what drives your quest to enter these majestic walls?`;
+
+export const WELCOME_MESSAGE_WRONG = `⚔️ <i>Perceval's eyes narrow, his hand moving to the hilt of his sword </i>
+
+"Treasure? YOURS by RIGHT?! How dare you approach these sacred halls with such greed in your heart! These treasures belong to Arthur and the righteous Knights who earned them through blood and honor - not to fortune hunters with sticky fingers and empty hearts!
+
+There is nothing for your kind here. Back to whatever distant land spawned you, before I show you firsthand how we deal with thieves at Camelot! Be gone, and count yourself fortunate I let you leave with your life intact!"
+`;
 
 export const KEEPER_HOME_MESSAGE = `Welcome to the <b>Vault Breaker Giveaway!</b> 🎁🎁 
 

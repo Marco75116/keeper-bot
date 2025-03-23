@@ -4,26 +4,32 @@ import {
   KEEPER_HOME_ACTIONS,
   WELCOME_ACTIONS,
 } from "../actions/global.actions";
-import { YUM_CHANNEL, YUM_GAME } from "../../constants/global.constant";
 
 export const getEmptyKeyBoard = () => {
   return Markup.inlineKeyboard([]);
 };
-export const getWelcomeKeyboard = (isUserExist: boolean) => {
-  const buttons = [
-    [Markup.button.url("🃏 Play Yum's Bar", YUM_GAME)],
-    [Markup.button.url("📢 Subscribe for Updates", YUM_CHANNEL)],
-    [Markup.button.callback("✕ Close", WELCOME_ACTIONS.CLOSE)],
-  ];
 
-  if (isUserExist) {
-    buttons.splice(1, 0, [
+export const getCloseKeyBoard = () => {
+  return Markup.inlineKeyboard([
+    [Markup.button.callback("✕ Close", KEEPER_HOME_ACTIONS.CLOSE)],
+  ]);
+};
+export const getWelcomeKeyboard = () => {
+  const buttons = [
+    [
       Markup.button.callback(
-        "🎁 Vault Breaker Giveaway - Challenge Keeper",
+        "💬 I've come for the treasure, give me what's mine.",
+        WELCOME_ACTIONS.WRONG
+      ),
+    ],
+    [
+      Markup.button.callback(
+        "💬 I seek to learn from Camelot's wisdom and honor its legacy.",
         WELCOME_ACTIONS.KEEPER
       ),
-    ]);
-  }
+    ],
+    [Markup.button.callback("✕ Close", WELCOME_ACTIONS.CLOSE)],
+  ];
 
   return Markup.inlineKeyboard(buttons);
 };

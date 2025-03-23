@@ -20,6 +20,7 @@ import {
   loadingStatesBalance,
   getInsufficientBalanceMessage,
   chooseNetworkPayment,
+  WELCOME_MESSAGE_WRONG,
 } from "../../constants/messages.constant";
 import {
   getAttemptKeyBoard,
@@ -28,6 +29,7 @@ import {
   getBuyStarsKeyboard,
   getBuyStarsKeyConfimationBoard,
   getChallengeKeyBoard,
+  getCloseKeyBoard,
   getEmptyKeyBoard,
   getInsufficientBalanceKeyBoard,
   getKeeperHomeKeyboard,
@@ -172,10 +174,10 @@ export const botStart = () => {
     if (!user) {
       createUser(ctx.from);
     }
-    const message = await ctx.reply(
-      WELCOME_MESSAGE,
-      getWelcomeKeyboard(!!user)
-    );
+    const message = await ctx.reply(WELCOME_MESSAGE, {
+      ...getWelcomeKeyboard(),
+      parse_mode: "HTML",
+    });
 
     await ctx.deleteMessage(ctx.update.message.message_id);
     await redisClient.set(chatIdKey, message.message_id.toString());
@@ -189,6 +191,11 @@ export const botStart = () => {
   bot.action(WELCOME_ACTIONS.KEEPER, async (ctx) => {
     await ctx.answerCbQuery();
     await handleMessage(ctx, KEEPER_HOME_MESSAGE, getKeeperHomeKeyboard());
+  });
+
+  bot.action(WELCOME_ACTIONS.WRONG, async (ctx) => {
+    await ctx.answerCbQuery();
+    await handleMessage(ctx, WELCOME_MESSAGE_WRONG, getCloseKeyBoard());
   });
 
   bot.action(KEEPER_HOME_ACTIONS.HELP, async (ctx) => {

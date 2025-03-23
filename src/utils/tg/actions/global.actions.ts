@@ -1,5 +1,6 @@
 export const WELCOME_ACTIONS = {
   KEEPER: "keeper",
+  WRONG: "wrong",
   CLOSE: "close",
 };
 
