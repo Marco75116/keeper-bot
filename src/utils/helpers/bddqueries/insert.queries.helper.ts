@@ -1,6 +1,7 @@
 import { eq, isNull, sql } from "drizzle-orm";
 import {
   attempts,
+  cashierWalletTon,
   poolPrize,
   ticketPurchasesViaBot,
   user,
@@ -12,6 +13,7 @@ import type {
   CreateUserParams,
   EncryptedData,
   InsertTicketPurchaseParams,
+  TONWalletParams,
 } from "../../types/global.type";
 import { v4 as uuidv4 } from "uuid";
 
@@ -162,27 +164,12 @@ export async function insertTicketPurchase({
   error?: string;
 }> {
   try {
-    const userResult = await db
-      .select({
-        id: user.id,
-      })
-      .from(user)
-      .where(eq(user.telegramId, telegramId))
-      .limit(1);
-
-    if (!userResult.length) {
-      return {
-        success: false,
-        error: "User not found",
-      };
-    }
-
     await db.insert(ticketPurchasesViaBot).values({
-      userId: userResult[0].id,
+      userId: telegramId,
       amountTickets: amountTickets,
       network: network,
       price: price.toString(),
-      txHash: txHash,
+      txHash: txHash || "",
     });
 
     return {
@@ -226,4 +213,15 @@ export const insertWallet = async (params: {
       encryptedPrivateKey: params.encryptedData.encryptedData,
     })
     .returning();
+};
+
+export const insertTONWallet = async (params: TONWalletParams) => {
+  try {
+    await db.insert(cashierWalletTon).values({
+      ...params,
+    });
+  } catch (error) {
+    console.error("Error inserting TON wallet:", error);
+    throw error;
+  }
 };

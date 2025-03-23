@@ -79,3 +79,12 @@ export interface CreateUserParams {
   languageCode?: string;
   tickets: number;
 }
+
+export type TONWalletParams = {
+  publicKey: string;
+  userId: number;
+  encryptedPrivateKeyData: string;
+  encryptedPrivateKeyIv: string;
+  address: string;
+  deployed?: boolean;
+};

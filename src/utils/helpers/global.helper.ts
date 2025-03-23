@@ -10,6 +10,7 @@ import {
   decrementTickets,
   incrementPoolPrize,
   insertAttempt,
+  insertTONWallet,
   insertUser,
   insertWallet,
   updatePoolPrizeWinner,
@@ -43,7 +44,7 @@ import {
 } from "../constants/global.constant";
 import { buy_PREFIX } from "../tg/actions/global.actions";
 import { getSolPriceFromCache } from "./solana.helper";
-import { getTonPriceFromCache } from "./ton.helper";
+import { createTONWalletV5, getTonPriceFromCache } from "./ton.helper";
 import { getOpenAIResponse } from "./openia.helper";
 import { createWallet } from "./viem.helper";
 
@@ -414,18 +415,32 @@ export async function getPriceInCrypto(
   }
 }
 
-export const createUser = (tgUser: User) => {
+export const createUser = async (tgUser: User) => {
   const walletDetails = createWallet();
   const encryptedData = encrypt(walletDetails.privateKey);
 
-  insertUser({
-    idtg: tgUser.id,
-    firstname: tgUser.first_name,
-    tgusername: tgUser.username,
-    lastName: tgUser.last_name,
-    languageCode: tgUser.language_code,
-    tickets: 5,
-  });
+  const tonWallet = await createTONWalletV5();
+  if (tonWallet) {
+    const secretKeyString = tonWallet.secretKey.toString("hex");
+    const encryptedTONData = encrypt(secretKeyString);
+
+    const newUser = await insertUser({
+      idtg: tgUser.id,
+      firstname: tgUser.first_name,
+      tgusername: tgUser.username,
+      lastName: tgUser.last_name,
+      languageCode: tgUser.language_code,
+      tickets: 5,
+    });
+
+    await insertTONWallet({
+      publicKey: tonWallet.publicKey.toString("hex"),
+      userId: newUser[0].telegramId,
+      encryptedPrivateKeyData: encryptedTONData.encryptedData,
+      encryptedPrivateKeyIv: encryptedTONData.iv,
+      address: tonWallet.address,
+    });
+  }
 
   insertWallet({
     idtg: tgUser.id,

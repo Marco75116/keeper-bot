@@ -119,48 +119,39 @@ export const wallets = pgTable(
 export const cashierWalletTon = pgTable(
   "cashier_wallet_ton",
   {
-    publicKey: varchar("public_key", { length: 255 }).primaryKey().notNull(),
-    userId: uuid("user_id").notNull(),
-    encryptedPrivateKeyData: varchar("encrypted_private_key_data", {
+    publicKey: text("publicKey").notNull().primaryKey(),
+
+    userId: integer("userId")
+      .notNull()
+      .references(() => user.telegramId, { onDelete: "cascade" })
+      .unique(),
+
+    encryptedPrivateKeyData: varchar("encryptedPrivateKeyData", {
       length: 500,
     }).notNull(),
-    encryptedPrivateKeyIv: varchar("encrypted_private_key_iv", {
-      length: 255,
-    }).notNull(),
-    address: varchar({ length: 255 }).notNull(),
-    deployed: boolean().default(false),
-    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
-      .default(sql`CURRENT_TIMESTAMP`)
-      .notNull(),
-    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" })
-      .default(sql`CURRENT_TIMESTAMP`)
-      .notNull(),
+
+    encryptedPrivateKeyIv: text("encryptedPrivateKeyIv").notNull(),
+
+    address: text("address").notNull(),
+
+    deployed: boolean("deployed").default(false),
+
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+
+    updatedAt: timestamp("updated_at").notNull().defaultNow(),
   },
-  (table) => [
-    index("cashier_wallet_ton_userid_index").using(
-      "btree",
-      table.userId.asc().nullsLast().op("uuid_ops")
-    ),
-    foreignKey({
-      columns: [table.userId],
-      foreignColumns: [user.id],
-      name: "cashier_wallet_ton_user_id_foreign",
-    }).onDelete("cascade"),
-    unique("cashier_wallet_ton_publickey_userid_unique").on(
-      table.publicKey,
-      table.userId
-    ),
-    unique("cashier_wallet_ton_userid_unique").on(table.userId),
-  ]
+  (table) => ({
+    userIdIdx: index("ton_userId_idx").on(table.userId),
+  })
 );
 
 export const ticketPurchasesViaBot = pgTable(
   "ticket_purchases_via_bot",
   {
-    id: uuid().primaryKey().notNull(),
-    userId: uuid("user_id")
+    id: serial("id").primaryKey(),
+    userId: bigint("user_id", { mode: "number" })
       .notNull()
-      .references(() => user.id),
+      .references(() => user.telegramId),
     amountTickets: integer("amount_tickets").notNull(),
     network: varchar("network", { length: 50 }).notNull(),
     price: varchar("price", { length: 255 }).notNull(),
@@ -172,7 +163,7 @@ export const ticketPurchasesViaBot = pgTable(
   (table) => [
     index("ticket_purchases_via_bot_userid_index").using(
       "btree",
-      table.userId.asc().nullsLast().op("uuid_ops")
+      table.userId.asc().nullsLast().op("int8_ops") // Changed to int8_ops since it's a bigint
     ),
   ]
 );
