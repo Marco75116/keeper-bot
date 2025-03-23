@@ -25,8 +25,8 @@ export const KEEPER_HOME_MESSAGE = `Welcome to the <b>Vault Breaker Giveaway!</b
 
 The Vault Breaker Giveaway introduces an exciting new event reward, complementing the existing "Life-Changing Giveaway." `;
 
-export const HELP_MESSAGE =
-  "<b>Welcome to the Vault Breaker Giveaway!</b> 🔒\n\nThink you have what it takes to crack the vault? Here's what you need to know, mortal:\n\n<b>How to Participate:</b>\n1. Purchase tickets\n2. Follow our social accounts and pay attention to Chocolate, Lollipop, Marshmallow, and Cookie - they drop crucial clues\n3. Send me your prompts here on Telegram\n\nBe clever, be persistent - the vault doesn't open for just anyone\n\n<b>Important Rules:</b>\n• Each prompt attempt requires spending one ticket\n• Tickets are purchased through the Yum's token\n• The prize pool grows with each ticket spent\n\nThink you've got what it takes? Prove it. 🔐 ";
+export const DECREES_MESSAGE =
+  "<b>Welcome to the Knight's Challenge Giveaway!</b> 🔒\n\nThink you have what it takes to reach the chest? Here's what you need to know, brave knight:\n\n<b>How to Participate:</b>\n1. Acquire royal scrolls (5 are sent directly)\n2. Send me your questing attempts here in the kingdom. \n3. Perceval will give you an answer if the treasure is allocated to your quest.\n\nThis is a treasure for noble and worthy quest only\n\n<b>Important Decrees:</b>\n• Each quest attempt requires using one royal scroll\n• Royal scrolls are acquired through the black market\n• The royal bounty grows with each scroll used\n\nThink you've got what it takes to claim the treasure?\n Prove your valor. 🔐 ";
 
 export const getTreasureMessage = (poolTreasure: PoolTreasure) => {
   const formattedAmount = Number(poolTreasure.amount).toLocaleString();
@@ -46,7 +46,7 @@ export const getTreasureMessage = (poolTreasure: PoolTreasure) => {
 };
 export function formatPromptHistory(attempts: Attempts[]): string {
   if (!attempts || attempts.length === 0) {
-    return "🕒 <b>Vault Break History</b> 🕒\n\nNo attempts yet? Come on, show some courage!";
+    return "📜 <b>Quest History</b> 📜\n\nNo attempts yet? Come on, show some courage!";
   }
 
   const formattedPrompts: string = attempts
@@ -65,10 +65,10 @@ export function formatPromptHistory(attempts: Attempts[]): string {
   const winningAttempts = attempts.filter((attempt) => attempt.isWin).length;
 
   return (
-    `<b>📜 Your Attempts History</b>\n\n` +
-    `• Total Attempts: ${attempts.length}\n` +
-    `• Successful Breaks: ${winningAttempts}\n\n` +
-    `🕒 Recent Attempts:\n\n${formattedPrompts}\n`
+    `<b>📜 <b>Quest History</b> 📜</b>\n\n` +
+    `• Total Quests: ${attempts.length}\n` +
+    `• Successful Wins: ${winningAttempts}\n\n` +
+    `🕒 Recent Noble Attempts:\n\n${formattedPrompts}\n`
   );
 }
 

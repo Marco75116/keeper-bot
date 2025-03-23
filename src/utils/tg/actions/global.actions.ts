@@ -7,7 +7,7 @@ export const WELCOME_ACTIONS = {
 export const KEEPER_HOME_ACTIONS = {
   HOME: "home",
   CHALLENGE: "challenge",
-  HELP: "help",
+  DECREES: "decrees",
   Treasure: "treasure",
   PROMPTS: "prompts",
   CLOSE: "close",

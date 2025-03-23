@@ -8,7 +8,7 @@ import {
   getTreasureMessage,
   getRandomRiddle,
   getWalletsMessage,
-  HELP_MESSAGE,
+  DECREES_MESSAGE,
   KEEPER_HOME_MESSAGE,
   WELCOME_MESSAGE,
   getBuyStarsMessage,
@@ -198,9 +198,9 @@ export const botStart = () => {
     await handleMessage(ctx, WELCOME_MESSAGE_WRONG, getCloseKeyBoard());
   });
 
-  bot.action(KEEPER_HOME_ACTIONS.HELP, async (ctx) => {
+  bot.action(KEEPER_HOME_ACTIONS.DECREES, async (ctx) => {
     await ctx.answerCbQuery();
-    await handleMessage(ctx, HELP_MESSAGE, getKeeperHomeKeyboard());
+    await handleMessage(ctx, DECREES_MESSAGE, getKeeperHomeKeyboard());
   });
 
   bot.action(KEEPER_HOME_ACTIONS.Treasure, async (ctx) => {

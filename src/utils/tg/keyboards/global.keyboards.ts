@@ -43,13 +43,13 @@ export const getKeeperHomeKeyboard = () => {
     ],
     [
       Markup.button.callback("🏆 Treasure", KEEPER_HOME_ACTIONS.Treasure),
-      Markup.button.callback("📜 Prompts", KEEPER_HOME_ACTIONS.PROMPTS),
+      Markup.button.callback("📜 Attempts", KEEPER_HOME_ACTIONS.PROMPTS),
     ],
     [
       Markup.button.callback("⛓️ Wallet", KEEPER_HOME_ACTIONS.WALLET),
-      Markup.button.callback("🎟️ Buy Ticket", KEEPER_HOME_ACTIONS.BUY),
+      Markup.button.callback("🎪 Black Market", KEEPER_HOME_ACTIONS.BUY),
     ],
-    [Markup.button.callback("🙋‍♂️ Help", KEEPER_HOME_ACTIONS.HELP)],
+    [Markup.button.callback("🙋‍♂️ Decrees", KEEPER_HOME_ACTIONS.DECREES)],
     [Markup.button.callback("✕ Close", KEEPER_HOME_ACTIONS.CLOSE)],
   ]);
 };
