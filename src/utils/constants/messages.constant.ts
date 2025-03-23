@@ -3,7 +3,7 @@ import type {
   Attempts,
   BuyConstructor,
   NetworkType,
-  PoolPrize,
+  PoolTreasure,
 } from "../types/global.type";
 import { SOL_TAG, TICKET_PRICE_IN_STARS, TON_TAG } from "./global.constant";
 
@@ -28,20 +28,20 @@ The Vault Breaker Giveaway introduces an exciting new event reward, complementin
 export const HELP_MESSAGE =
   "<b>Welcome to the Vault Breaker Giveaway!</b> 🔒\n\nThink you have what it takes to crack the vault? Here's what you need to know, mortal:\n\n<b>How to Participate:</b>\n1. Purchase tickets\n2. Follow our social accounts and pay attention to Chocolate, Lollipop, Marshmallow, and Cookie - they drop crucial clues\n3. Send me your prompts here on Telegram\n\nBe clever, be persistent - the vault doesn't open for just anyone\n\n<b>Important Rules:</b>\n• Each prompt attempt requires spending one ticket\n• Tickets are purchased through the Yum's token\n• The prize pool grows with each ticket spent\n\nThink you've got what it takes? Prove it. 🔐 ";
 
-export const getPoolPrizeMessage = (prizePool: PoolPrize) => {
-  const formattedAmount = Number(prizePool.amount).toLocaleString();
-  const formattedDate = prizePool.createdAt.toLocaleDateString();
+export const getTreasureMessage = (poolTreasure: PoolTreasure) => {
+  const formattedAmount = Number(poolTreasure.amount).toLocaleString();
+  const formattedDate = poolTreasure.createdAt.toLocaleDateString();
 
   return (
-    `💰 <b>Prize Vault Status</b> 💰\n\n` +
-    `<b>Prize Pool #${prizePool.id}</b>\n\n` +
+    `🏆 <b>Nobility Treasure Status</b> 🏆\n\n` +
+    `<b>Knight's Challenge Chest #${poolTreasure.id}</b>\n\n` +
     `<b>Established:</b> ${formattedDate}\n\n` +
-    `<b>Locked Inside:</b> $ ${formattedAmount} USD\n` +
-    `<b>Failed Attempts:</b> ${prizePool.totalAttempts.toLocaleString()}\n\n` +
-    `<b>Keeper's Vault:</b>\n` +
-    `The prize grows with every failure! Keep feeding your tickets to my vault, humans. Someone might crack it... eventually.\n\n` +
-    `🔥 Prize increases with each attempt\n` +
-    `⚡ One winner takes everything`
+    `<b>🛡️ Bounty Inside:</b> $ ${formattedAmount} USD\n` +
+    `<b>⚔️ Failed Quests:</b> ${poolTreasure.totalAttempts.toLocaleString()}\n\n` +
+    `<b>Perceval:</b>\n` +
+    `King Arthur increases the treasure for noble causes with each failure.Continue your noble quests, brave knights. Perhaps one of you will succeed in winning back this chest... if fate smiles on you.\n\n` +
+    `🔮 Bounty multiplies with each quest\n` +
+    `👑 One champion claims all riches`
   );
 };
 export function formatPromptHistory(attempts: Attempts[]): string {

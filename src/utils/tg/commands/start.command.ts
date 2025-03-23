@@ -5,7 +5,7 @@ import {
   getChallengeMessage,
   paymentOptionsMessage,
   getPaymentSuccessMessage,
-  getPoolPrizeMessage,
+  getTreasureMessage,
   getRandomRiddle,
   getWalletsMessage,
   HELP_MESSAGE,
@@ -51,7 +51,7 @@ import {
 } from "../../helpers/global.helper";
 import {
   getAttemptsByIdTg,
-  getPrizePool,
+  getTreasurePool,
   getSolWalletPublicKey,
   getTonWalletAddress,
   getUser,
@@ -203,12 +203,12 @@ export const botStart = () => {
     await handleMessage(ctx, HELP_MESSAGE, getKeeperHomeKeyboard());
   });
 
-  bot.action(KEEPER_HOME_ACTIONS.POOLPRIZE, async (ctx) => {
+  bot.action(KEEPER_HOME_ACTIONS.Treasure, async (ctx) => {
     await ctx.answerCbQuery();
-    const poolPrize = await getPrizePool();
+    const poolTreasure = await getTreasurePool();
     await handleMessage(
       ctx,
-      getPoolPrizeMessage(poolPrize.data),
+      getTreasureMessage(poolTreasure.data),
       getKeeperHomeKeyboard()
     );
   });

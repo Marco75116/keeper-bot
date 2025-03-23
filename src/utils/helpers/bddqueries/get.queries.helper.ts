@@ -5,7 +5,7 @@ import {
   attempts,
   cashierWalletSol,
   cashierWalletTon,
-  poolPrize,
+  poolTreasure,
   user,
 } from "../../../db/schema";
 import type { CachedUser } from "../../types/global.type";
@@ -92,25 +92,25 @@ export const getAttemptsByIdTg = async (idtg: number) => {
     .orderBy(desc(attempts.sentAt));
 };
 
-export const setCachedPrizePool = async () => {
+export const setCachedPoolTreasure = async () => {
   const result = await db
     .select()
-    .from(poolPrize)
-    .where(isNull(poolPrize.winDate))
+    .from(poolTreasure)
+    .where(isNull(poolTreasure.winDate))
     .limit(1);
 
-  const activePrizePool = result[0] || null;
+  const activePoolTreasure = result[0] || null;
 
-  if (activePrizePool) {
-    await redisClient.set(POOL_CACHED_KEY, JSON.stringify(activePrizePool), {
+  if (activePoolTreasure) {
+    await redisClient.set(POOL_CACHED_KEY, JSON.stringify(activePoolTreasure), {
       EX: 300,
     });
   }
 
-  return activePrizePool;
+  return activePoolTreasure;
 };
 
-export const updateCachedPrizePool = async (updates: {
+export const updateCachedTreasurePool = async (updates: {
   amount?: string;
   totalAttempts?: number;
 }) => {
@@ -127,11 +127,11 @@ export const updateCachedPrizePool = async (updates: {
       });
     }
   } catch (error) {
-    console.error("Error updating cached prize pool:", error);
+    console.error("Error updating cached Treasure pool:", error);
   }
 };
 
-export const getPrizePool = async () => {
+export const getTreasurePool = async () => {
   try {
     const cachedPool = await redisClient.get(POOL_CACHED_KEY);
     if (cachedPool) {
@@ -146,13 +146,13 @@ export const getPrizePool = async () => {
       };
     }
 
-    const pool = await setCachedPrizePool();
+    const pool = await setCachedPoolTreasure();
     return {
       success: true,
       data: pool,
     };
   } catch (error) {
-    console.error("Error fetching prize pool:", error);
+    console.error("Error fetching Treasure Pool:", error);
     return {
       success: false,
       error: error,

@@ -6,21 +6,21 @@ import type {
 } from "../types/global.type";
 import crypto, { randomUUID } from "crypto";
 import {
-  createPrizePool,
+  createPoolTreasure,
   decrementTickets,
-  incrementPoolPrize,
+  incrementPoolTreasure,
   insertAttempt,
   insertTONWallet,
   insertUser,
   insertWallet,
-  updatePoolPrizeWinner,
+  updatePoolTreasureWinner,
 } from "./bddqueries/insert.queries.helper";
 import { Context, Markup } from "telegraf";
 import { bot } from "../clients/telegraf.client";
 import { redisClient } from "../clients/redis.client";
 import {
   setCachedUser,
-  updateCachedPrizePool,
+  updateCachedTreasurePool,
 } from "./bddqueries/get.queries.helper";
 import {
   formatAttemptConversation,
@@ -219,29 +219,29 @@ export const handleAttempt = async (ctx: any) => {
 
     const [userUpdated, incrementResult] = await Promise.all([
       setCachedUser(userId),
-      incrementPoolPrize(),
+      incrementPoolTreasure(),
     ]);
 
     if (incrementResult.success && incrementResult.data) {
-      await updateCachedPrizePool({
+      await updateCachedTreasurePool({
         amount: incrementResult.data.amount,
         totalAttempts: incrementResult.data.totalAttempts,
       });
     }
 
-    let amountPrizePoolWin = 0;
+    let amountPoolTreasureWin = 0;
     if (data?.is_secret_discovered) {
-      const returnPrizePoolWin = await updatePoolPrizeWinner(userId);
-      amountPrizePoolWin = Number(returnPrizePoolWin.data?.amount);
-      console.log(`User ${userId} won the prize pool!`);
-      const createdPool = await createPrizePool();
-      console.log("Prize pool created:", createdPool.data?.id);
+      const returnPoolTreasureWin = await updatePoolTreasureWinner(userId);
+      amountPoolTreasureWin = Number(returnPoolTreasureWin.data?.amount);
+      console.log(`User ${userId} won the Treasure pool!`);
+      const createdPool = await createPoolTreasure();
+      console.log("Treasure pool created:", createdPool.data?.id);
     }
 
     const postAttempScreen = formatAttemptConversation(
       ctx.message.text,
       res || "",
-      amountPrizePoolWin,
+      amountPoolTreasureWin,
       userUpdated?.attempts,
       data.is_secret_discovered
     );

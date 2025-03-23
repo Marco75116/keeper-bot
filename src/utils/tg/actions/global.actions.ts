@@ -8,7 +8,7 @@ export const KEEPER_HOME_ACTIONS = {
   HOME: "home",
   CHALLENGE: "challenge",
   HELP: "help",
-  POOLPRIZE: "poolprize",
+  Treasure: "treasure",
   PROMPTS: "prompts",
   CLOSE: "close",
   ATTEMPT: "attempt",

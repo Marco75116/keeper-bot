@@ -2,7 +2,7 @@ import { eq, isNull, sql } from "drizzle-orm";
 import {
   attempts,
   cashierWalletTon,
-  poolPrize,
+  poolTreasure,
   ticketPurchasesViaBot,
   user,
   wallets,
@@ -53,10 +53,10 @@ export const decrementTickets = async (telegramId: number) => {
   }
 };
 
-export const createPrizePool = async () => {
+export const createPoolTreasure = async () => {
   try {
-    const result = await db.insert(poolPrize).values({}).returning({
-      id: poolPrize.id,
+    const result = await db.insert(poolTreasure).values({}).returning({
+      id: poolTreasure.id,
     });
 
     return {
@@ -71,18 +71,18 @@ export const createPrizePool = async () => {
   }
 };
 
-export const incrementPoolPrize = async () => {
+export const incrementPoolTreasure = async () => {
   try {
     const result = await db
-      .update(poolPrize)
+      .update(poolTreasure)
       .set({
-        amount: sql`${poolPrize.amount} + 0.56`,
-        totalAttempts: sql`${poolPrize.totalAttempts} + 1`,
+        amount: sql`${poolTreasure.amount} + 0.56`,
+        totalAttempts: sql`${poolTreasure.totalAttempts} + 1`,
       })
-      .where(isNull(poolPrize.winDate))
+      .where(isNull(poolTreasure.winDate))
       .returning({
-        amount: poolPrize.amount,
-        totalAttempts: poolPrize.totalAttempts,
+        amount: poolTreasure.amount,
+        totalAttempts: poolTreasure.totalAttempts,
       });
 
     return {
@@ -97,20 +97,20 @@ export const incrementPoolPrize = async () => {
   }
 };
 
-export const updatePoolPrizeWinner = async (idtgWinner: number) => {
+export const updatePoolTreasureWinner = async (idtgWinner: number) => {
   try {
     const result = await db
-      .update(poolPrize)
+      .update(poolTreasure)
       .set({
         idtgWinner: idtgWinner,
         winDate: new Date(),
       })
-      .where(isNull(poolPrize.winDate))
+      .where(isNull(poolTreasure.winDate))
       .returning({
-        id: poolPrize.id,
-        amount: poolPrize.amount,
-        idtgWinner: poolPrize.idtgWinner,
-        winDate: poolPrize.winDate,
+        id: poolTreasure.id,
+        amount: poolTreasure.amount,
+        idtgWinner: poolTreasure.idtgWinner,
+        winDate: poolTreasure.winDate,
       });
 
     return {

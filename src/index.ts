@@ -1,18 +1,18 @@
 import { redisClient, redisConnect } from "./utils/clients/redis.client";
 import { bot } from "./utils/clients/telegraf.client";
-import { getPrizePool } from "./utils/helpers/bddqueries/get.queries.helper";
-import { createPrizePool } from "./utils/helpers/bddqueries/insert.queries.helper";
+import { getTreasurePool } from "./utils/helpers/bddqueries/get.queries.helper";
+import { createPoolTreasure } from "./utils/helpers/bddqueries/insert.queries.helper";
 import { botStart } from "./utils/tg/commands/start.command";
 async function main() {
   try {
     await redisConnect();
 
-    const { data: currentPool } = await getPrizePool();
+    const { data: currentPool } = await getTreasurePool();
     if (!currentPool) {
-      const createdPool = await createPrizePool();
-      console.log("Prize pool created:", createdPool.data?.id);
+      const createdPool = await createPoolTreasure();
+      console.log("Pool Treasure created:", createdPool.data?.id);
     } else {
-      console.log("Current Prize pool:", currentPool.id);
+      console.log("Current Treasure pool:", currentPool.id);
     }
 
     botStart();

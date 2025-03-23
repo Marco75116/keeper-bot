@@ -1,9 +1,9 @@
-import { attempts, poolPrize, user } from "../../db/schema";
+import { attempts, poolTreasure, user } from "../../db/schema";
 import type { NETWORKS_TAG } from "../constants/global.constant";
 
 export type User = typeof user.$inferSelect;
 export type Attempts = typeof attempts.$inferSelect;
-export type PoolPrize = typeof poolPrize.$inferSelect;
+export type PoolTreasure = typeof poolTreasure.$inferSelect;
 
 export interface WalletDetails {
   walletAddress: `0x${string}`;

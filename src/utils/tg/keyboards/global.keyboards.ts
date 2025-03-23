@@ -42,7 +42,7 @@ export const getKeeperHomeKeyboard = () => {
       ),
     ],
     [
-      Markup.button.callback("💰 Pool Prize", KEEPER_HOME_ACTIONS.POOLPRIZE),
+      Markup.button.callback("🏆 Treasure", KEEPER_HOME_ACTIONS.Treasure),
       Markup.button.callback("📜 Prompts", KEEPER_HOME_ACTIONS.PROMPTS),
     ],
     [

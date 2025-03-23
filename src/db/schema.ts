@@ -24,7 +24,7 @@ export const attempts = pgTable("attempts", {
   sentAt: timestamp("sent_at").defaultNow().notNull(),
 });
 
-export const poolPrize = pgTable("pool_prize", {
+export const poolTreasure = pgTable("pool_treasure", {
   id: serial("id").primaryKey(),
   amount: numeric("amount").notNull().default("0"),
   totalAttempts: integer("total_attempts").notNull().default(0),
