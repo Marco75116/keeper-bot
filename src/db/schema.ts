@@ -5,9 +5,7 @@ import {
   integer,
   timestamp,
   index,
-  foreignKey,
   unique,
-  uuid,
   text,
   boolean,
   numeric,
@@ -29,15 +27,17 @@ export const poolTreasure = pgTable("pool_treasure", {
   amount: numeric("amount").notNull().default("0"),
   totalAttempts: integer("total_attempts").notNull().default(0),
   winDate: timestamp("win_date"),
-  idtgWinner: bigint("idtg_winner", { mode: "number" }), // Added mode configuration
+  idtgWinner: bigint("idtg_winner", { mode: "number" }),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
-
 export const cashierWalletSol = pgTable(
   "cashier_wallet_sol",
   {
     publicKey: varchar("public_key", { length: 255 }).primaryKey().notNull(),
-    userId: uuid("user_id").notNull(),
+    userId: integer("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" })
+      .unique(),
     encryptedPrivateKeyData: varchar("encrypted_private_key_data", {
       length: 500,
     }).notNull(),
@@ -55,13 +55,8 @@ export const cashierWalletSol = pgTable(
   (table) => [
     index("cashier_wallet_sol_userid_index").using(
       "btree",
-      table.userId.asc().nullsLast().op("uuid_ops")
+      table.userId.asc().nullsLast()
     ),
-    foreignKey({
-      columns: [table.userId],
-      foreignColumns: [user.id],
-      name: "cashier_wallet_sol_user_id_foreign",
-    }).onDelete("cascade"),
     unique("cashier_wallet_sol_publickey_userid_unique").on(
       table.publicKey,
       table.userId
@@ -73,7 +68,7 @@ export const cashierWalletSol = pgTable(
 export const user = pgTable(
   "user",
   {
-    id: uuid().primaryKey().notNull(),
+    id: serial("id").primaryKey(),
     telegramId: bigint("telegram_id", { mode: "number" }).notNull(),
     username: varchar({ length: 50 }).default("player").notNull(),
     firstName: varchar("first_name", { length: 50 }).notNull(),
@@ -163,7 +158,7 @@ export const ticketPurchasesViaBot = pgTable(
   (table) => [
     index("ticket_purchases_via_bot_userid_index").using(
       "btree",
-      table.userId.asc().nullsLast().op("int8_ops") // Changed to int8_ops since it's a bigint
+      table.userId.asc().nullsLast().op("int8_ops")
     ),
   ]
 );

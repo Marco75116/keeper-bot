@@ -15,7 +15,6 @@ import type {
   InsertTicketPurchaseParams,
   TONWalletParams,
 } from "../../types/global.type";
-import { v4 as uuidv4 } from "uuid";
 
 export const insertAttempt = async (params: CreateAttemptParams) => {
   return await db
@@ -188,7 +187,6 @@ export const insertUser = async (params: CreateUserParams) => {
   return await db
     .insert(user)
     .values({
-      id: uuidv4(),
       telegramId: params.idtg,
       username: params.tgusername || "player",
       firstName: params.firstname,

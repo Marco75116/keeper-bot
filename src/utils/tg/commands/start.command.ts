@@ -4,7 +4,6 @@ import {
   formatPromptHistory,
   getChallengeMessage,
   paymentOptionsMessage,
-  getPaymentSuccessMessage,
   getTreasureMessage,
   getRandomRiddle,
   getWalletsMessage,
@@ -20,7 +19,6 @@ import {
   loadingStatesBalance,
   getInsufficientBalanceMessage,
   chooseNetworkPayment,
-  WELCOME_MESSAGE_WRONG,
 } from "../../constants/messages.constant";
 import {
   getAttemptKeyBoard,
@@ -29,8 +27,6 @@ import {
   getBuyStarsKeyboard,
   getBuyStarsKeyConfimationBoard,
   getChallengeKeyBoard,
-  getCloseKeyBoard,
-  getEmptyKeyBoard,
   getInsufficientBalanceKeyBoard,
   getKeeperHomeKeyboard,
   getPaymentOptionsKeyboard,
@@ -61,7 +57,6 @@ import {
   BUY_ACTIONS,
   buy_PREFIX,
   KEEPER_HOME_ACTIONS,
-  WELCOME_ACTIONS,
 } from "../actions/global.actions";
 import { redisClient } from "../../clients/redis.client";
 import { getChatId } from "../../helpers/global.helper";
@@ -93,61 +88,12 @@ import {
   getBalancesFromCache,
   setCachedBalances,
 } from "../../helpers/redis.helper";
+import { handlePaymentStars } from "./paymentstars.command";
+import { handleWelcome } from "./welcome.command";
 
 export const botStart = () => {
-  bot.on("pre_checkout_query", async (ctx) => {
-    try {
-      console.log("pre_checkout_query");
-      await ctx.answerPreCheckoutQuery(true);
-    } catch (error) {
-      console.error("Error in pre-checkout:", error);
-      await ctx.answerPreCheckoutQuery(
-        false,
-        "An error occurred. Please try again."
-      );
-    }
-  });
-
-  bot.on("successful_payment", async (ctx) => {
-    try {
-      const userId = ctx.from.id;
-      const payment = ctx.message.successful_payment;
-
-      const numberTicketsBought = payment.total_amount / TICKET_PRICE_IN_STARS;
-
-      const ticketsResponce = await incrementTickets(
-        userId,
-        numberTicketsBought
-      );
-
-      insertTicketPurchase({
-        telegramId: userId,
-        amountTickets: numberTicketsBought,
-        network: XTR_TAG,
-        price: payment.total_amount,
-        txHash: payment.telegram_payment_charge_id,
-      });
-
-      if (!ticketsResponce.success || ticketsResponce.tickets === undefined) {
-        console.error("Failed to increment tickets");
-        return;
-      }
-
-      const [_, messageId] = await Promise.all([
-        setCachedUser(userId),
-        redisClient.get(getChatId(ctx.chat.id)),
-      ]);
-
-      await handleMessage(
-        ctx,
-        getPaymentSuccessMessage(ticketsResponce.tickets),
-        getPaymentSuccessKeyBoard(),
-        Number(messageId)
-      );
-    } catch (error) {
-      console.error("Error processing Stars payment:", error);
-    }
-  });
+  handleWelcome();
+  handlePaymentStars();
 
   bot.on(message("text"), async (ctx) => {
     const userId = ctx.from.id;
@@ -181,21 +127,6 @@ export const botStart = () => {
 
     await ctx.deleteMessage(ctx.update.message.message_id);
     await redisClient.set(chatIdKey, message.message_id.toString());
-  });
-
-  bot.action(WELCOME_ACTIONS.CLOSE, async (ctx) => {
-    await ctx.answerCbQuery();
-    await ctx.deleteMessage(ctx.update.callback_query.message?.message_id);
-  });
-
-  bot.action(WELCOME_ACTIONS.KEEPER, async (ctx) => {
-    await ctx.answerCbQuery();
-    await handleMessage(ctx, KEEPER_HOME_MESSAGE, getKeeperHomeKeyboard());
-  });
-
-  bot.action(WELCOME_ACTIONS.WRONG, async (ctx) => {
-    await ctx.answerCbQuery();
-    await handleMessage(ctx, WELCOME_MESSAGE_WRONG, getCloseKeyBoard());
   });
 
   bot.action(KEEPER_HOME_ACTIONS.DECREES, async (ctx) => {
