@@ -15,7 +15,9 @@ import { sql } from "drizzle-orm";
 
 export const attempts = pgTable("attempts", {
   id: serial("id").primaryKey(),
-  idtg: bigint("idtg", { mode: "number" }).notNull(),
+  idtg: bigint("idtg", { mode: "number" })
+    .notNull()
+    .references(() => user.telegramId, { onDelete: "cascade" }),
   userPrompt: text("user_prompt").notNull(),
   keeperMessage: text("keeper_message").notNull(),
   isWin: boolean("is_win").notNull().default(false),
@@ -33,7 +35,7 @@ export const poolTreasure = pgTable("pool_treasure", {
 
 export const cashierWalletSol = pgTable("cashier_wallet_sol", {
   publicKey: varchar("public_key", { length: 255 }).primaryKey().notNull(),
-  userId: integer("userId")
+  userId: bigint("userId", { mode: "number" })
     .notNull()
     .references(() => user.telegramId, { onDelete: "cascade" })
     .unique(),
@@ -100,7 +102,7 @@ export const cashierWalletTon = pgTable(
   {
     publicKey: text("publicKey").notNull().primaryKey(),
 
-    userId: integer("userId")
+    userId: bigint("userId", { mode: "number" })
       .notNull()
       .references(() => user.telegramId, { onDelete: "cascade" })
       .unique(),
