@@ -9,7 +9,12 @@ import {
   user,
 } from "../../../db/schema";
 import type { CachedUser } from "../../types/global.type";
-import { POOL_CACHED_KEY } from "../../constants/global.constant";
+import {
+  POOL_CACHED_KEY,
+  SOL_WALLET_CACHE_KEY_PREFIX,
+  TON_WALLET_CACHE_KEY_PREFIX,
+  WALLET_CACHE_EXPIRY,
+} from "../../constants/global.constant";
 
 export const setCachedUser = async (
   telegramId: number
@@ -162,34 +167,71 @@ export const getTreasurePool = async () => {
 
 export const getTonWalletAddress = async (telegramId: number) => {
   try {
-    const result = await db
-      .select({
-        address: cashierWalletTon.address,
-      })
-      .from(cashierWalletTon)
-      .where(eq(cashierWalletTon.userId, telegramId))
-      .limit(1);
+    const cacheKey = `${TON_WALLET_CACHE_KEY_PREFIX}${telegramId}`;
+    const cachedAddress = await redisClient.get(cacheKey);
 
-    return result[0]?.address;
+    if (cachedAddress) {
+      return cachedAddress;
+    }
+
+    const address = await fetchTonWalletAddressFromDb(telegramId);
+
+    if (address) {
+      await redisClient.set(cacheKey, address, {
+        EX: WALLET_CACHE_EXPIRY,
+      });
+    }
+
+    return address;
   } catch (error) {
     console.error("Error fetching TON wallet address:", error);
     throw error;
   }
 };
 
+const fetchTonWalletAddressFromDb = async (telegramId: number) => {
+  const result = await db
+    .select({
+      address: cashierWalletTon.address,
+    })
+    .from(cashierWalletTon)
+    .where(eq(cashierWalletTon.userId, telegramId))
+    .limit(1);
+
+  return result[0]?.address;
+};
+
 export const getSolWalletPublicKey = async (telegramId: number) => {
   try {
-    const result = await db
-      .select({
-        publicKey: cashierWalletSol.publicKey,
-      })
-      .from(cashierWalletSol)
-      .where(eq(cashierWalletSol.userId, telegramId))
-      .limit(1);
+    const cacheKey = `${SOL_WALLET_CACHE_KEY_PREFIX}${telegramId}`;
+    const cachedPublicKey = await redisClient.get(cacheKey);
 
-    return result[0]?.publicKey;
+    if (cachedPublicKey) {
+      return cachedPublicKey;
+    }
+    const publicKey = await fetchSolWalletPublicKeyFromDb(telegramId);
+
+    if (publicKey) {
+      await redisClient.set(cacheKey, publicKey, {
+        EX: WALLET_CACHE_EXPIRY,
+      });
+    }
+
+    return publicKey;
   } catch (error) {
     console.error("Error fetching SOL wallet public key:", error);
     throw error;
   }
+};
+
+const fetchSolWalletPublicKeyFromDb = async (telegramId: number) => {
+  const result = await db
+    .select({
+      publicKey: cashierWalletSol.publicKey,
+    })
+    .from(cashierWalletSol)
+    .where(eq(cashierWalletSol.userId, telegramId))
+    .limit(1);
+
+  return result[0]?.publicKey;
 };

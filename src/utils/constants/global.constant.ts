@@ -39,6 +39,10 @@ export const TICKET_PRICE_USD = 0.8;
 export const BALANCES_CACHE_KEY = "USER:BALANCES";
 export const BALANCES_CACHE_EXPIRY = 300;
 
+export const TON_WALLET_CACHE_KEY_PREFIX = "ton_wallet_address:";
+export const SOL_WALLET_CACHE_KEY_PREFIX = "sol_wallet_publickey:";
+export const WALLET_CACHE_EXPIRY = 60 * 60;
+
 export const URL_PERPLEXITY = "https://api.perplexity.ai";
 export const MODEL_AI = "llama-3.1-sonar-small-128k-online";
 
