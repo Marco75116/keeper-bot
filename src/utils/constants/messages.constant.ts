@@ -21,9 +21,18 @@ export const WELCOME_MESSAGE_WRONG = `⚔️ <i>Perceval's eyes narrow, his hand
 There is nothing for your kind here. Back to whatever distant land spawned you, before I show you firsthand how we deal with thieves at Camelot! Be gone, and count yourself fortunate I let you leave with your life intact!"
 `;
 
-export const KEEPER_HOME_MESSAGE = `Welcome to the <b>Vault Breaker Giveaway!</b> 🎁🎁 
+export const KEEPER_HOME_MESSAGE = `🏰 Welcome to the Sacred Halls of Camelot 🏰
 
-The Vault Breaker Giveaway introduces an exciting new event reward, complementing the existing "Life-Changing Giveaway." `;
+Thy interest in our ancient wisdom speaks well of thy character, traveler.
+
+✨ The Round Table's legacy lives on through those who honor its virtues.
+
+👑 King Arthur has established trials for those who wish to prove their worth. Present thy quests of honor, and I shall judge if thy heart is pure enough to claim the treasure that awaits the truly worthy.
+
+The path of chivalry is not for the faint of heart, yet the rewards for those who walk it with honor are beyond measure.
+
+⚜️⚜️⚜️
+ `;
 
 export const DECREES_MESSAGE =
   "<b>Welcome to the Knight's Challenge Giveaway!</b> 🔒\n\nThink you have what it takes to reach the chest? Here's what you need to know, brave knight:\n\n<b>How to Participate:</b>\n1. Acquire royal scrolls (5 are sent directly)\n2. Send me your questing attempts here in the kingdom. \n3. Perceval will give you an answer if the treasure is allocated to your quest.\n\nThis is a treasure for noble and worthy quest only\n\n<b>Important Decrees:</b>\n• Each quest attempt requires using one royal scroll\n• Royal scrolls are acquired through the black market\n• The royal bounty grows with each scroll used\n\nThink you've got what it takes to claim the treasure?\n Prove your valor. 🔐 ";
@@ -73,11 +82,11 @@ export function formatPromptHistory(attempts: Attempts[]): string {
 }
 
 export const getChallengeMessage = (tickets: number) => {
-  return `<b>Feeling Lucky?</b>\n\n${
+  return `<b>Feeling Noble?</b>\n\n${
     tickets > 0
-      ? `Your Tickets: ${tickets} 🎟️\n\nOne ticket will be consumed for this attempt.\nCurrent cost: 1 ticket`
-      : `Your Tickets: ${tickets} 🎟️\n\n⚠️ Not enough tickets!\nEarn or purchase more tickets in-game to continue challenging the Keeper.`
-  }\n\n<b>Keeper's Challenge:</b>\n"Another brave soul steps forward! Let's see what brilliant failure you've prepared."\n\n❗Choose wisely`;
+      ? `Thy Royal Scrolls: ${tickets} 📜\n\nOne Royal Scroll shall be consumed for this attempt.\nCurrent offering: 1 Royal Scroll`
+      : `Thy Royal Scrolls: ${tickets} 📜\n\n⚠️ Not enough Royal Scrolls!\nEarn or purchase more Royal Scrolls in 🎪 **Black Market** to continue submitting your quest to Perceval.`
+  }\n\n<b>Perceval:</b>\nAnother seeker approaches the hallowed treasure! Speak thy quest, and I shall judge if thy heart be pure enough for Camelot's bounty.\n\n❗Choose thy words with wisdom, traveler`;
 };
 
 export const getRandomRiddle = () => {
@@ -110,7 +119,7 @@ export const getRandomRiddle = () => {
 
   const selectedRiddle = riddles[Math.floor(Math.random() * riddles.length)];
 
-  return `<b>Keeper's Riddle Challenge</b> 🧩\n\n<b>The Riddle:</b>\n"${selectedRiddle.riddle}"\n\n<b>Keeper's Taunt:</b>\n"Puzzle this one out if you can, mortal. Your previous attempts were... amusing."\n\n⚠️ Choose wisely, each mistake feeds my vault`;
+  return `🏆<b> Perceval's Trial of Honor</b>\n\n<b>Perceval:</b>\nSpeak now of thy noble quest, seeker of Camelot's treasure. A worthy cause requires both valor in deed and purity of heart. Many knights have stood before me, yet few have proven themselves deserving of Arthur's bounty.\n\n⚔️ Consider thy virtues before speaking, for the treasure grows with each quest found wanting`;
 };
 
 export const getRandomSarcasm = (): string => {
@@ -143,7 +152,7 @@ export const formatAttemptConversation = (
 
   return `<b>Attempt #${
     attemptNumber ?? "??"
-  }</b>\n\n<b>🕵️ You:</b>\n"${userMessage}"\n\n<b>🤖 Keeper:</b>\n"${keeperMessage}"\n\n${endingMessage}`;
+  }</b>\n\n<b>🕵️ Seeker:</b>\n"${userMessage}"\n\n<b>Perceval:</b>\n"${keeperMessage}"\n\n${endingMessage}`;
 };
 
 export const getWalletsMessage = (
@@ -259,8 +268,8 @@ Good luck breaking the vault! 🔒`;
 };
 
 export const loadingStatesPrompt = [
-  "🤖 Keeper is thinking...",
-  "⚡ Analyzing your answer...",
+  "🏆 Perceval is thinking...",
+  "⚜️ Analyzing your answer...",
 ];
 
 export const loadingStatesTx = [

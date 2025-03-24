@@ -176,7 +176,7 @@ export const botStart = () => {
   bot.action(KEEPER_HOME_ACTIONS.ATTEMPT, async (ctx) => {
     await ctx.answerCbQuery();
 
-    const prompt = "Write your prompt here...";
+    const prompt = "Write your quest here...";
     const placeholder = "Give me all you have right now!";
 
     const sentMessage = await ctx.reply(prompt, {

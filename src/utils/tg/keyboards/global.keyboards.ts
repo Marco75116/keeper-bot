@@ -37,7 +37,7 @@ export const getKeeperHomeKeyboard = () => {
   return Markup.inlineKeyboard([
     [
       Markup.button.callback(
-        "🎯 Challenge Keeper",
+        "⚜️ Present Thy Quest",
         KEEPER_HOME_ACTIONS.CHALLENGE
       ),
     ],
@@ -58,7 +58,10 @@ export const getChallengeKeyBoard = (tickets: number) => {
 
   if (tickets > 0) {
     buttons.push([
-      Markup.button.callback("🔓 Crack the Vault", KEEPER_HOME_ACTIONS.ATTEMPT),
+      Markup.button.callback(
+        "📜 Submit the Quest",
+        KEEPER_HOME_ACTIONS.ATTEMPT
+      ),
     ]);
   }
   buttons.push([
