@@ -17,7 +17,7 @@ import type {
   SolWalletDetails,
 } from "../types/global.type";
 import { decrypt } from "./global.helper";
-import { cashierWalletSol, user } from "../../db/schema";
+import { cashierWalletSol } from "../../db/schema";
 import { db } from "../clients/drizzle.client";
 import { eq } from "drizzle-orm";
 import bs58 from "bs58";
