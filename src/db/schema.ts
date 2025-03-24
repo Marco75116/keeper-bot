@@ -30,40 +30,24 @@ export const poolTreasure = pgTable("pool_treasure", {
   idtgWinner: bigint("idtg_winner", { mode: "number" }),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
-export const cashierWalletSol = pgTable(
-  "cashier_wallet_sol",
-  {
-    publicKey: varchar("public_key", { length: 255 }).primaryKey().notNull(),
-    userId: integer("user_id")
-      .notNull()
-      .references(() => user.id, { onDelete: "cascade" })
-      .unique(),
-    encryptedPrivateKeyData: varchar("encrypted_private_key_data", {
-      length: 500,
-    }).notNull(),
-    encryptedPrivateKeyIv: varchar("encrypted_private_key_iv", {
-      length: 255,
-    }).notNull(),
-    deployed: boolean().default(false),
-    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
-      .default(sql`CURRENT_TIMESTAMP`)
-      .notNull(),
-    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" })
-      .default(sql`CURRENT_TIMESTAMP`)
-      .notNull(),
-  },
-  (table) => [
-    index("cashier_wallet_sol_userid_index").using(
-      "btree",
-      table.userId.asc().nullsLast()
-    ),
-    unique("cashier_wallet_sol_publickey_userid_unique").on(
-      table.publicKey,
-      table.userId
-    ),
-    unique("cashier_wallet_sol_userid_unique").on(table.userId),
-  ]
-);
+
+export const cashierWalletSol = pgTable("cashier_wallet_sol", {
+  publicKey: varchar("public_key", { length: 255 }).primaryKey().notNull(),
+  userId: integer("userId")
+    .notNull()
+    .references(() => user.telegramId, { onDelete: "cascade" })
+    .unique(),
+  encryptedPrivateKeyData: varchar("encrypted_private_key_data", {
+    length: 500,
+  }).notNull(),
+  encryptedPrivateKeyIv: varchar("encrypted_private_key_iv", {
+    length: 255,
+  }).notNull(),
+  deployed: boolean().default(false),
+  createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+});
 
 export const user = pgTable(
   "user",

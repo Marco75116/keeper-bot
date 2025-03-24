@@ -88,3 +88,8 @@ export type TONWalletParams = {
   address: string;
   deployed?: boolean;
 };
+
+export interface SolWalletDetails {
+  publicKey: string;
+  privateKey: string;
+}

@@ -1,6 +1,7 @@
 import { eq, isNull, sql } from "drizzle-orm";
 import {
   attempts,
+  cashierWalletSol,
   cashierWalletTon,
   poolTreasure,
   ticketPurchasesViaBot,
@@ -222,4 +223,26 @@ export const insertTONWallet = async (params: TONWalletParams) => {
     console.error("Error inserting TON wallet:", error);
     throw error;
   }
+};
+
+export const insertSOLWallet = async ({
+  publicKey,
+  userId,
+  encryptedPrivateKeyData,
+  encryptedPrivateKeyIv,
+}: {
+  publicKey: string;
+  userId: number;
+  encryptedPrivateKeyData: string;
+  encryptedPrivateKeyIv: string;
+}) => {
+  return await db
+    .insert(cashierWalletSol)
+    .values({
+      publicKey,
+      userId,
+      encryptedPrivateKeyData,
+      encryptedPrivateKeyIv,
+    })
+    .returning();
 };

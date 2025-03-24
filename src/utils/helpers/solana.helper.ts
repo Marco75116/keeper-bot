@@ -14,6 +14,7 @@ import type {
   EncryptedData,
   SendSolResult,
   SolPriceResult,
+  SolWalletDetails,
 } from "../types/global.type";
 import { decrypt } from "./global.helper";
 import { cashierWalletSol, user } from "../../db/schema";
@@ -202,3 +203,15 @@ export async function getSolPrice(
     };
   }
 }
+
+export const createSOLWallet = (): SolWalletDetails => {
+  const keypair = Keypair.generate();
+
+  const publicKey = keypair.publicKey.toString();
+  const privateKey = bs58.encode(keypair.secretKey);
+
+  return {
+    publicKey,
+    privateKey,
+  };
+};
