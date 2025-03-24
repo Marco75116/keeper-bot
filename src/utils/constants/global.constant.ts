@@ -37,7 +37,7 @@ export const TON_PRICE_CACHE_KEY = `${TON_TAG}:PRICE`;
 export const TICKET_PRICE_USD = 0.8;
 
 export const BALANCES_CACHE_KEY = "USER:BALANCES";
-export const BALANCES_CACHE_EXPIRY = 300;
+export const BALANCES_CACHE_EXPIRY = 600;
 
 export const TON_WALLET_CACHE_KEY_PREFIX = "ton_wallet_address:";
 export const SOL_WALLET_CACHE_KEY_PREFIX = "sol_wallet_publickey:";

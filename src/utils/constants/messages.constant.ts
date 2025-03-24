@@ -190,11 +190,11 @@ export const getBuyStarsMessage = (amount: string) => {
   const totalStars = Number(amount) * TICKET_PRICE_IN_STARS;
 
   let msg = `⭐️ <b>BUY WITH STARS</b>\n\n`;
-  msg += `1 🎟️ = ${TICKET_PRICE_IN_STARS} ⭐️\n\n`;
-  msg += `🎟️ <b>Tickets:</b> ${amount?.trim() || "..."}\n`;
+  msg += `1 📜 = ${TICKET_PRICE_IN_STARS} ⭐️\n\n`;
+  msg += `📜 <b>Royal Scrolls:</b> ${amount?.trim() || "..."}\n`;
   msg += `✨ <b>Total:</b> ${totalStars} \n\n`;
   msg += `Ready to shine? Click confirmation to proceed with your purchase with stars! 🌟\n\n`;
-  msg += `Select the amount of tickets below 👇`;
+  msg += `Select the amount of Royal Scrolls below 👇`;
 
   return msg;
 };
@@ -205,7 +205,7 @@ export const getBuyCryptoMessage = (
 ) => {
   let msg = `🪙 <b>BUY WITH CRYPTO</b>\n\n`;
   msg += `🌐 <b>Network:</b> ${buyObject.network?.trim() || "..."}\n`;
-  msg += `🎟️ <b>Tickets:</b> ${buyObject.amount?.trim() || "..."}\n`;
+  msg += `📜 <b>Royal Scrolls:</b> ${buyObject.amount?.trim() || "..."}\n`;
   msg += `💰 <b>Total:</b> ${priceInCrypto.toFixed(4) || "..."} ${
     buyObject.network === TON_TAG
       ? TON_TAG
@@ -214,7 +214,7 @@ export const getBuyCryptoMessage = (
       : ""
   }\n\n`;
   msg += `Please review the purchase details carefully. Once confirmed, the transfer will be initiated. 🔐\n\n`;
-  msg += `Select the amount of tickets below 👇`;
+  msg += `Select the amount of Royal Scrolls below 👇`;
 
   return msg;
 };
@@ -246,7 +246,7 @@ export const getSolPaymentSuccessMessage = (
   const solTxLink = getLink("View tx", `https://solscan.io/tx/${signature}`);
   return `✨ <b>Payment Successful!</b>
 
-Your current Royal Scrolls balance: ${tickets} 🎟
+Your current Royal Scrolls balance: ${tickets} 📜
 
 ${solTxLink} 🔎 
 
@@ -260,7 +260,7 @@ export const getTONPaymentSuccessMessage = (
   const tonTxLink = getLink("View tx", `https://tonscan.org/tx/${hash}`);
   return `✨ <b>Payment Successful!</b>
 
-Your current Royal Scrolls balance: ${tickets} 🎟
+Your current Royal Scrolls balance: ${tickets} 📜
 
 ${tonTxLink} 🔎 
 

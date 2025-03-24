@@ -45,8 +45,7 @@ export async function getPrivateSolKeyByTelegramId(
         encryptedPrivateKeyIv: cashierWalletSol.encryptedPrivateKeyIv,
       })
       .from(cashierWalletSol)
-      .innerJoin(user, eq(user.id, cashierWalletSol.userId))
-      .where(eq(user.telegramId, telegramId))
+      .where(eq(cashierWalletSol.userId, telegramId))
       .limit(1);
 
     if (!walletData.length) {

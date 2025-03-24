@@ -142,10 +142,8 @@ export const getTonKeysByTelegramId = async (
         publicKey: cashierWalletTon.publicKey,
       })
       .from(cashierWalletTon)
-      .innerJoin(user, eq(user.id, cashierWalletTon.userId))
-      .where(eq(user.telegramId, telegramId))
+      .where(eq(cashierWalletTon.userId, telegramId))
       .limit(1);
-
     if (!walletData.length) {
       throw new Error("No TON wallet found for this telegram user");
     }

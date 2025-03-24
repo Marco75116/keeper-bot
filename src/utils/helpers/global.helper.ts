@@ -357,9 +357,9 @@ export async function createInvoiceLink(
   telegraf: Context<any>,
   amountTicket: number
 ) {
-  const productLabel = `${amountTicket} ticket${
+  const productLabel = `${amountTicket} Royal Scrolls${
     amountTicket > 1 ? "s" : ""
-  } 🎟️`;
+  } 📜️`;
   const payload = randomUUID();
 
   try {
