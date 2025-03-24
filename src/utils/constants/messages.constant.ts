@@ -219,7 +219,7 @@ export const getBuyCryptoMessage = (
   return msg;
 };
 
-export const paymentOptionsMessage = `🎟️ <b>Choose Your Payment Method</b>
+export const paymentOptionsMessage = `🎪 <b>Black Market</b>
 
 ⭐️ <b>Stars</b>
 Pay directly with Telegram Stars - quick and easy!
@@ -227,16 +227,16 @@ Pay directly with Telegram Stars - quick and easy!
 🪙 <b>Cryptocurrency</b>
 Pay with ${TON_TAG} or ${SOL_TAG}.
 
-Select your preferred payment method below 👇`;
+Choose how thou shalt secure thy Royal Scrolls 👇`;
 
 export const getPaymentSuccessMessage = (tickets: number) => {
   return `✨ <b>Payment Successful!</b>
 
 Thank you for your Stars! ⭐️
 
-Your current ticket balance: ${tickets} 🎟
+Your current Royal Scrolls balance: ${tickets} 📜
 
-Good luck breaking the vault! 🔒`;
+May fortune smile upon thy quest for the sacred treasure! 🔒`;
 };
 
 export const getSolPaymentSuccessMessage = (
@@ -246,11 +246,11 @@ export const getSolPaymentSuccessMessage = (
   const solTxLink = getLink("View tx", `https://solscan.io/tx/${signature}`);
   return `✨ <b>Payment Successful!</b>
 
-Your current ticket balance: ${tickets} 🎟
+Your current Royal Scrolls balance: ${tickets} 🎟
 
 ${solTxLink} 🔎 
 
-Good luck breaking the vault! 🔒`;
+May fortune smile upon thy quest for the sacred treasure! 🔒`;
 };
 
 export const getTONPaymentSuccessMessage = (
@@ -260,11 +260,11 @@ export const getTONPaymentSuccessMessage = (
   const tonTxLink = getLink("View tx", `https://tonscan.org/tx/${hash}`);
   return `✨ <b>Payment Successful!</b>
 
-Your current ticket balance: ${tickets} 🎟
+Your current Royal Scrolls balance: ${tickets} 🎟
 
 ${tonTxLink} 🔎 
 
-Good luck breaking the vault! 🔒`;
+May fortune smile upon thy quest for the sacred treasure! 🔒`;
 };
 
 export const loadingStatesPrompt = [
