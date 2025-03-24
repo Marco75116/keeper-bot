@@ -167,8 +167,7 @@ export const getTonWalletAddress = async (telegramId: number) => {
         address: cashierWalletTon.address,
       })
       .from(cashierWalletTon)
-      .innerJoin(user, eq(cashierWalletTon.userId, user.id))
-      .where(eq(user.telegramId, telegramId))
+      .where(eq(cashierWalletTon.userId, telegramId))
       .limit(1);
 
     return result[0]?.address;
@@ -185,8 +184,7 @@ export const getSolWalletPublicKey = async (telegramId: number) => {
         publicKey: cashierWalletSol.publicKey,
       })
       .from(cashierWalletSol)
-      .innerJoin(user, eq(cashierWalletSol.userId, user.id))
-      .where(eq(user.telegramId, telegramId))
+      .where(eq(cashierWalletSol.userId, telegramId))
       .limit(1);
 
     return result[0]?.publicKey;

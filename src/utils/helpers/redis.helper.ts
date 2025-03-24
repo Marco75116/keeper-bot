@@ -8,6 +8,7 @@ import { getSOLBalance } from "./solana.helper";
 import { getTONBalance } from "./ton.helper";
 
 export const setCachedBalances = async (
+  userId: number,
   tonAddress: string,
   solAddress: string
 ): Promise<CachedBalances | null> => {
@@ -22,7 +23,9 @@ export const setCachedBalances = async (
       sol: solBalance,
     };
 
-    await redisClient.set(BALANCES_CACHE_KEY, JSON.stringify(balances), {
+    const casheKey = `${BALANCES_CACHE_KEY}-${userId}`;
+
+    await redisClient.set(casheKey, JSON.stringify(balances), {
       EX: BALANCES_CACHE_EXPIRY,
     });
 
@@ -34,11 +37,13 @@ export const setCachedBalances = async (
 };
 
 export const getBalancesFromCache = async (
+  userId: number,
   tonAddress: string,
   solAddress: string
 ): Promise<CachedBalances | null> => {
   try {
-    const cachedBalances = await redisClient.get(BALANCES_CACHE_KEY);
+    const casheKey = `${BALANCES_CACHE_KEY}-${userId}`;
+    const cachedBalances = await redisClient.get(casheKey);
     if (cachedBalances) {
       const parsedBalances = JSON.parse(cachedBalances) as CachedBalances;
 
@@ -48,7 +53,11 @@ export const getBalancesFromCache = async (
       };
     }
 
-    const newCachedBalances = await setCachedBalances(tonAddress, solAddress);
+    const newCachedBalances = await setCachedBalances(
+      userId,
+      tonAddress,
+      solAddress
+    );
     return newCachedBalances;
   } catch (error) {
     console.error("Error fetching balances from cache:", error);
@@ -57,17 +66,19 @@ export const getBalancesFromCache = async (
 };
 
 export const getTonBalanceFromCache = async (
+  userId: number,
   tonAddress: string,
   solAddress: string
 ): Promise<number | null> => {
-  const balances = await getBalancesFromCache(tonAddress, solAddress);
+  const balances = await getBalancesFromCache(userId, tonAddress, solAddress);
   return balances?.ton ?? null;
 };
 
 export const getSolBalanceFromCache = async (
+  userId: number,
   tonAddress: string,
   solAddress: string
 ): Promise<number | null> => {
-  const balances = await getBalancesFromCache(tonAddress, solAddress);
+  const balances = await getBalancesFromCache(userId, tonAddress, solAddress);
   return balances?.sol ?? null;
 };

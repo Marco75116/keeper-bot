@@ -88,7 +88,7 @@ import {
   getBalancesFromCache,
   setCachedBalances,
 } from "../../helpers/redis.helper";
-import { handlePaymentStars } from "./paymentstars.command";
+import { handlePaymentStars } from "./paymentStars.command";
 import { handleWelcome } from "./welcome.command";
 
 export const botStart = () => {
@@ -210,7 +210,7 @@ export const botStart = () => {
     ]);
 
     const [cachedBalances, tonPrice, solPrice] = await Promise.all([
-      getBalancesFromCache(tonWallet, solanaWallet).catch((error) => {
+      getBalancesFromCache(userId, tonWallet, solanaWallet).catch((error) => {
         console.error("Balance fetch error:", error);
         return { ton: 0, sol: 0 };
       }),
@@ -255,10 +255,10 @@ export const botStart = () => {
       getTonWalletAddress(userId),
       getSolWalletPublicKey(userId),
     ]);
-    await setCachedBalances(tonWallet, solanaWallet);
+    await setCachedBalances(userId, tonWallet, solanaWallet);
 
     const [cachedBalances, tonPrice, solPrice] = await Promise.all([
-      getBalancesFromCache(tonWallet, solanaWallet).catch((error) => {
+      getBalancesFromCache(userId, tonWallet, solanaWallet).catch((error) => {
         console.error("Balance fetch error:", error);
         return { ton: 0, sol: 0 };
       }),
@@ -449,7 +449,11 @@ export const botStart = () => {
         getSolWalletPublicKey(userId),
       ]);
 
-      const cachedBalances = await setCachedBalances(tonWallet, solanaWallet);
+      const cachedBalances = await setCachedBalances(
+        userId,
+        tonWallet,
+        solanaWallet
+      );
       if (!pk) {
         console.error("Sol payment error while retrieve private key");
         return;
@@ -496,7 +500,7 @@ export const botStart = () => {
           txHash: resultSolPayment.signature,
         });
 
-        setCachedBalances(tonWallet, solanaWallet);
+        setCachedBalances(userId, tonWallet, solanaWallet);
         setCachedUser(userId);
 
         if (!ticketsResponce.success || ticketsResponce.tickets === undefined) {
@@ -523,7 +527,11 @@ export const botStart = () => {
           getSolWalletPublicKey(userId),
         ]);
 
-      const cachedBalances = await setCachedBalances(tonWallet, solanaWallet);
+      const cachedBalances = await setCachedBalances(
+        userId,
+        tonWallet,
+        solanaWallet
+      );
 
       if (!walletKeys.privateKey || !walletKeys.publicKey) {
         console.error("TON payment error while retrieving wallet keys");
@@ -573,7 +581,7 @@ export const botStart = () => {
           txHash: resultTonPayment.hash,
         });
 
-        setCachedBalances(tonWallet, solanaWallet);
+        setCachedBalances(userId, tonWallet, solanaWallet);
         setCachedUser(userId);
 
         if (!ticketsResponse.success || ticketsResponse.tickets === undefined) {
