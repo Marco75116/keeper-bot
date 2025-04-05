@@ -24,7 +24,7 @@ export const getWelcomeKeyboard = () => {
     ],
     [
       Markup.button.callback(
-        "💬 I seek to learn from Camelot's wisdom and honor its legacy.",
+        "💬 I seek to learn from Camelot's wisdom.",
         WELCOME_ACTIONS.KEEPER
       ),
     ],
