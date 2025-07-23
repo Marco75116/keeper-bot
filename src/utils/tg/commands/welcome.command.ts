@@ -13,7 +13,16 @@ import {
 export const handleWelcome = () => {
   bot.action(WELCOME_ACTIONS.CLOSE, async (ctx) => {
     await ctx.answerCbQuery();
-    await ctx.deleteMessage(ctx.update.callback_query.message?.message_id);
+    try {
+      await ctx.deleteMessage(ctx.update.callback_query.message?.message_id);
+    } catch (error: any) {
+      if (error?.response?.error_code === 400 && 
+          error?.response?.description?.includes("message can't be deleted")) {
+        console.error("Cannot delete message:", error.response.description);
+      } else {
+        console.error("Error deleting message:", error);
+      }
+    }
   });
 
   bot.action(WELCOME_ACTIONS.KEEPER, async (ctx) => {

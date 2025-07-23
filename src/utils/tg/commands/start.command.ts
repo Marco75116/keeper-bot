@@ -100,8 +100,27 @@ export const botStart = () => {
     const chatIdKey = getChatId(ctx.chat.id);
 
     if (ctx.message.reply_to_message) {
-      await ctx.deleteMessage(ctx.message.message_id);
-      await ctx.deleteMessage(ctx.message.reply_to_message.message_id);
+      try {
+        await ctx.deleteMessage(ctx.message.message_id);
+      } catch (error: any) {
+        if (error?.response?.error_code === 400 && 
+            error?.response?.description?.includes("message can't be deleted")) {
+          console.error("Cannot delete user message:", error.response.description);
+        } else {
+          console.error("Error deleting user message:", error);
+        }
+      }
+      
+      try {
+        await ctx.deleteMessage(ctx.message.reply_to_message.message_id);
+      } catch (error: any) {
+        if (error?.response?.error_code === 400 && 
+            error?.response?.description?.includes("message can't be deleted")) {
+          console.error("Cannot delete reply message:", error.response.description);
+        } else {
+          console.error("Error deleting reply message:", error);
+        }
+      }
 
       const status = await redisClient.get(
         ctx.message.reply_to_message.message_id.toString()
@@ -125,7 +144,16 @@ export const botStart = () => {
       parse_mode: "HTML",
     });
 
-    await ctx.deleteMessage(ctx.update.message.message_id);
+    try {
+      await ctx.deleteMessage(ctx.update.message.message_id);
+    } catch (error: any) {
+      if (error?.response?.error_code === 400 && 
+          error?.response?.description?.includes("message can't be deleted")) {
+        console.error("Cannot delete message:", error.response.description);
+      } else {
+        console.error("Error deleting message:", error);
+      }
+    }
     await redisClient.set(chatIdKey, message.message_id.toString());
   });
 
