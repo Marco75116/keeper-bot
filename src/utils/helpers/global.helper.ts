@@ -112,7 +112,13 @@ export const handleMessage = async (
         options
       );
     }
-  } catch (error) {
+  } catch (error: any) {
+    if (
+      error?.response?.error_code === 400 &&
+      error?.response?.description?.includes("message is not modified")
+    ) {
+      return;
+    }
     console.error("Error in handleMessage:", error);
   }
 };
@@ -166,13 +172,23 @@ export const startLoading = async (
         ...getEmptyKeyBoard(),
       };
 
-      await bot.telegram.editMessageText(
-        chatId,
-        Number(messageId),
-        undefined,
-        loadingStates[i % loadingStates.length],
-        options
-      );
+      try {
+        await bot.telegram.editMessageText(
+          chatId,
+          Number(messageId),
+          undefined,
+          loadingStates[i % loadingStates.length],
+          options
+        );
+      } catch (error: any) {
+        if (
+          error?.response?.error_code === 400 &&
+          error?.response?.description?.includes("message is not modified")
+        ) {
+          continue;
+        }
+        console.error("Error in startLoading:", error);
+      }
 
       await new Promise((resolve) => setTimeout(resolve, 1000));
       i++;
@@ -258,13 +274,23 @@ export const handleAttempt = async (ctx: any) => {
       ...getAttemptKeyBoard(),
     };
 
-    await bot.telegram.editMessageText(
-      chatId,
-      Number(messageId),
-      undefined,
-      postAttempScreen,
-      options
-    );
+    try {
+      await bot.telegram.editMessageText(
+        chatId,
+        Number(messageId),
+        undefined,
+        postAttempScreen,
+        options
+      );
+    } catch (error: any) {
+      if (
+        error?.response?.error_code === 400 &&
+        error?.response?.description?.includes("message is not modified")
+      ) {
+        return;
+      }
+      console.error("Error in handleAttempt editMessageText:", error);
+    }
   } catch (error) {
     stopLoading();
     await loadingPromise;
