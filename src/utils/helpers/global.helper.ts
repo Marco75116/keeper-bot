@@ -41,7 +41,6 @@ import {
   TICKET_PRICE_IN_STARS,
   TICKET_PRICE_USD,
   TON_TAG,
-  URL_KEEPER,
 } from "../constants/global.constant";
 import { buy_PREFIX } from "../tg/actions/global.actions";
 import { createSOLWallet, getSolPriceFromCache } from "./solana.helper";
@@ -216,12 +215,7 @@ export const handleAttempt = async (ctx: any) => {
 
   try {
     const res = await getOpenAIResponse(ctx.message.text);
-    // const { data, success, error } = await sendChatMessage(ctx.message.text);
 
-    // if (!success || !data) {
-    //   console.error("Chat API error:", error);
-    //   return;
-    // }
     const data = { is_secret_discovered: false };
 
     const passed = await decrementTickets(userId);
@@ -302,42 +296,6 @@ export interface ChatResponse {
   is_secret_discovered: boolean;
   status: "success" | "error";
 }
-
-export interface ChatResult {
-  success: boolean;
-  data?: ChatResponse;
-  error?: unknown;
-}
-
-export const sendChatMessage = async (message: string): Promise<ChatResult> => {
-  try {
-    const response = await fetch(URL_KEEPER, {
-      method: "POST",
-      headers: {
-        accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        message: message,
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const data: ChatResponse = await response.json();
-    return {
-      success: true,
-      data: data,
-    };
-  } catch (error) {
-    return {
-      success: false,
-      error: error,
-    };
-  }
-};
 
 export const getLink = (text: string, link: string) => {
   return `<b><a href="${link}">${text}</a></b>`;

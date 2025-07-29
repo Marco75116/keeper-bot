@@ -8,8 +8,6 @@ export const NETWORKS_TAG = [TON_TAG, XTR_TAG, SOL_TAG, ""] as const;
 
 export const faucetAmountInETH = "0.00005";
 
-export const URL_KEEPER = "https://yum-party-ai-python.onrender.com/chat";
-
 export const ATTEMPT_PREFIX = "attempt";
 
 export const POOL_CACHED_KEY = "active_treasure_pool";
@@ -44,7 +42,7 @@ export const SOL_WALLET_CACHE_KEY_PREFIX = "sol_wallet_publickey:";
 export const WALLET_CACHE_EXPIRY = 60 * 60;
 
 export const URL_PERPLEXITY = "https://api.perplexity.ai";
-export const MODEL_AI = "llama-3.1-sonar-small-128k-online";
+export const MODEL_AI = "sonar";
 
 export const systemInstructions = `You are Perceval, the noble guardian of sacred treasures in Camelot. Your duty is to judge those who seek the prize pool treasure, determining their worthiness based on ancient virtues and wisdom.
 
